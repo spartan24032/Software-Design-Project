@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Landing Page</title>
+    <style>
+        /* Add your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .links {
+            margin-top: 50px;
+        }
+        .links a {
+            margin: 0 20px;
+            text-decoration: none;
+            color: blue;
+            font-weight: bold;
+        }
+        .image-container {
+            margin-top: 50px;
+        }
+        .image-container img {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Vanguard Energy Co.</h1>
+        <div class="links">
+            <a href="/fuel_quote_history">Fuel Quote History</a>
+            <a href="/fuel_quote_form">Fuel Quote Form</a>
+            <a href="/client_profile_management">Client Profile Management</a>
+            <a href="/login">Login</a>
+            <a href="/signup">Sign Up</a>
+        </div>
+        <div class="image-container">
+            <a href="/pic_of_company">
+                <img src="{{ url_for('static', filename=image_filename) }}" alt="Example Image">
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Vanguard Energy Co.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+  }
+
+  #header {
+    position: relative;
+    top: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 3rem;
+    background-color: #2C74FF;
+    box-shadow: 0px 2px 5px #888888;
+  }
+
+  #navbar {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .logo {
+    margin: 0 0.5rem 0 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    width: 20rem;
+  }
+
+  .navlist {
+    display: flex;
+    list-style: none;
+    justify-content: flex-end;
+    width: fit-content;
+  }
+
+  .navlist-item {
+    font-size: 1.2rem;
+    margin: 0 0.5rem 0 0.5rem;
+    list-style: none;
+    color: white;
+    font-weight: bold;
+  }
+
+  .nav-buttons {
+    display: flex;
+    width: 24rem;
+    justify-content: flex-end;
+  }
+
+  .nav-buttons button {
+    padding: 0.5rem 1.75rem 0.5rem 1.75rem;
+    border-radius: 0.25rem;
+    border: none;
+  }
+
+  .log-in {
+    background-color: white;
+    margin: 0 0.5rem 0 0.25rem;
+    color: #2C74FF;
+    font-weight: bold;
+  }
+
+  .sign-up {
+    background-color: #181B6A;
+    margin: 0 0.25rem 0 0;
+    color: white;
+    font-weight: bold;
+  }
+
+  .log-out {
+    width: 100%;
+    padding: 0.5rem 1.75rem 0.5rem 1.75rem;
+    border: none;
+    background-color: white;
+    margin: 1rem 0.5rem 0 0.5rem;
+    color: #2C74FF;
+    font-weight: bold;
+    border-radius: 0.25rem;
+  }
+
+  #profile-management {
+    display: flex;
+    flex-direction: column;
+    background-color: #F9FBFF;
+    padding-top: 2rem;
+  }
+
+  .profile-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2C74FF;
+    margin-left: 4rem;
+  }
+
+  .profile-nav {
+    display: flex;
+    width: 100%;
+    height: 3rem;
+  }
+
+  .profile-nav-list {
+    display: flex;
+    align-items: center;
+    background-color: #2C74FF;
+    width: 100%;
+    padding-left: 3.5rem;
+  }
+
+  .profile-nav-item {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0 0.25rem 0 0.25rem;
+    list-style: none;
+    color: white;
+    padding: 0.75rem;
+  }
+
+  .profile-nav-item-active {
+    color: #2C74FF;
+    background-color: white;
+    border-radius: 0;
+  }
+
+  #edit-profile {
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    width: 20rem;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.5rem;
+    background-color: white;
+    margin: 2.5rem 0 2rem 4rem;
+  }
+
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+  }
+
+  #delete-profile {
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    width: 20rem;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.5rem;
+    background-color: white;
+    margin: 2.5rem 0 2rem 4rem;
+  }
+
+  .delete-form {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+  }
+
+  .form-field {
+    display: flex;
+    margin-top: 0.5rem;
+  }
+
+  .form-label {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input {
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: 0.3rem;
+    width: 100%;
+    background-color: #F9FBFF;
+    display: inline-block;
+    border: 1px solid #D9D9D9;
+  }
+
+  .edit-button {
+    padding: 0 0.5rem 0 0.5rem;
+    width: 3rem;
+    border-radius: 0.3rem;
+    margin: 0;
+    background-color: white;
+    display: inline-block;
+    border: 1px solid #D9D9D9;
+  }
+
+  .delete-warning {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #D9D9D9;
+    background-color: #F9FBFF;
+    border-radius: 0.5rem;
+  }
+
+  .settings-button {
+    width: 8rem;
+  }
+
+  .settings-dropdown {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 5rem;
+    width: 10rem;
+    padding: 0.75rem;
+    top: 3rem;
+    right: 0;
+    background-color: #2C74FF;
+  }
+</style>
+
+<body>
+  <header id="header">
+    <div class="logo">
+      Vanguard Energy Co.
+    </div>
+    <nav id="navbar">
+      <ul class="navlist">
+        <li class="navlist-item">File Quote</li>
+        <li class="navlist-item">File Quote History</li>
+        <li class="navlist-item">About</li>
+      </ul>
+    </nav>
+    <div class="nav-buttons">
+      <button class="log-in button">
+        Log In
+      </button>
+      <button class="sign-up button">
+        Sign Up
+      </button>
+    </div>
+    <div class="settings-button">
+      <div id="settings-svg">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-10 -11 44 44" stroke-width="1.5"
+          stroke="currentColor" class="w-6 h-6">
+          <path stroke="white" stroke-linecap="round" stroke-linejoin="round"
+            d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+          <path stroke="white" stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+      </div>
+    </div>
+    <div class="settings-dropdown" id="settings-dropdown" style="display: none;">
+      <span class="navlist-item">Manage Profile</span>
+      <button class="log-out button">Log Out</button>
+    </div>
+  </header>
+  <section id="profile-management">
+    <span class="profile-title">Profile Settings</span>
+    <navbar class="profile-nav">
+      <ul class="profile-nav-list">
+        <li class="profile-nav-item profile-nav-item-active" id="edit-profile-link">Edit Profile</li>
+        <li class="profile-nav-item" id="delete-profile-link">Delete Profile</li>
+      </ul>
+    </navbar>
+    <div id="edit-profile">
+      <form class="edit-form">
+        <label class="form-label" for="username">
+          Username:
+          <div class="form-field">
+            <input class="form-input" type="text" id="username" name="username">
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="form-label" for="fullname">
+          Full Name:
+          <div class="form-field">
+            <input class="form-input" type="text" id="fullname" name="fullname" required>
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="form-label" for="password">
+          Password:
+          <div class="form-field">
+            <input class="form-input" type="password" id="password" name="password" readonly>
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="form-label" for="address1">
+          Address 1:
+          <div class="form-field">
+            <input class="form-input" type="text" id="address1" name="address1" required>
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="form-label" for="address2">
+          Address 2:
+          <div class="form-field">
+            <input class="form-input" type="text" id="address2" name="address2">
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="form-label" for="states">
+          State:
+          <div class="form-field">
+            <select class="form-input" id="states" name="states" required>
+              <option value="AL">Alabama</option>
+              <option value="AK">Alaska</option>
+              <option value="AZ">Arizona</option>
+              <option value="AR">Arkansas</option>
+              <option value="CA">California</option>
+              <option value="CO">Colorado</option>
+              <option value="CT">Connecticut</option>
+              <option value="DE">Delaware</option>
+              <option value="FL">Florida</option>
+              <option value="GA">Georgia</option>
+              <option value="HI">Hawaii</option>
+              <option value="ID">Idaho</option>
+              <option value="IL">Illinois</option>
+              <option value="IN">Indiana</option>
+              <option value="IA">Iowa</option>
+              <option value="KS">Kansas</option>
+              <option value="KY">Kentucky</option>
+              <option value="LA">Louisiana</option>
+              <option value="ME">Maine</option>
+              <option value="MD">Maryland</option>
+              <option value="MA">Massachusetts</option>
+              <option value="MI">Michigan</option>
+              <option value="MN">Minnesota</option>
+              <option value="MS">Mississippi</option>
+              <option value="MO">Missouri</option>
+              <option value="MT">Montana</option>
+              <option value="NE">Nebraska</option>
+              <option value="NV">Nevada</option>
+              <option value="NH">New Hampshire</option>
+              <option value="NJ">New Jersey</option>
+              <option value="NM">New Mexico</option>
+              <option value="NY">New York</option>
+              <option value="NC">North Carolina</option>
+              <option value="ND">North Dakota</option>
+              <option value="OH">Ohio</option>
+              <option value="OK">Oklahoma</option>
+              <option value="OR">Oregon</option>
+              <option value="PA">Pennsylvania</option>
+              <option value="RI">Rhode Island</option>
+              <option value="SC">South Carolina</option>
+              <option value="SD">South Dakota</option>
+              <option value="TN">Tennessee</option>
+              <option value="TX">Texas</option>
+              <option value="UT">Utah</option>
+              <option value="VT">Vermont</option>
+              <option value="VA">Virginia</option>
+              <option value="WA">Washington</option>
+              <option value="WV">West Virginia</option>
+              <option value="WI">Wisconsin</option>
+              <option value="WY">Wyoming</option>
+            </select>
+          </div>
+        </label>
+        <label class="form-label" for="city">
+          City:
+          <div class="form-field">
+            <input class="form-input" type="text" id="city" name="city" required>
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <label class="form-label" for="zipcode">
+          Zipcode:
+          <div class="form-field">
+            <input class="form-input" type="text" id="zipcode" name="zipcode" required>
+            <button type="button" class="edit-button">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+              </svg>
+            </button>
+          </div>
+        </label>
+        <br>
+        <hr style="border: 1px solid #D9D9D9;">
+        <br>
+        <button type="submit" class="sign-up button"
+          style="width: 100%; padding: 0.75rem 1.25rem 0.75rem 1.25rem; background-color: #2C74FF; border: none; border-radius: 0.25rem;">
+          Save Changes
+        </button>
+      </form>
+    </div>
+    <div id="delete-profile" style="display: none;">
+      <form class="delete-form">
+        <label class="form-label">
+          Enter password to confirm:
+          <div class="form-field">
+            <input class="form-input" type="password" name="password" placeholder="">
+          </div>
+        </label>
+      </form>
+      <br>
+      <hr style="border: 1px solid #D9D9D9;">
+      <br>
+      <button class="sign-up button"
+        style="width: 100%; padding: 0.75rem 1.25rem 0.75rem 1.25rem; background-color: #F94F4F; border: none; border-radius: 0.25rem;">
+        Delete Profile
+      </button>
+      <p class="delete-warning">Once deleted, there is no way to restore your information! All of your information will
+        be removed from our system.</p>
+    </div>
+  </section>
+  <script src="script.js"></script>
+</body>
+
+</html>

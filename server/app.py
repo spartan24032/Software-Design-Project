@@ -1,5 +1,5 @@
 
-from flask import Flask, jsonify,render_template
+from flask import Flask,send_file,jsonify,render_template
 from flask_cors import CORS
 import os
 
@@ -42,6 +42,10 @@ def loggin():
 @app.route('/signup')
 def sign_up():
     return render_template('signup.html')
+
+@app.route('/styles.css')
+def style_css():
+    return send_file(current_dir+r'\public\styles.css')
 
 if __name__ == '__main__':
     app.run()

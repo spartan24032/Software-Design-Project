@@ -34,7 +34,7 @@ def fuel_quote_history():
 def profile_management():
     return render_template('profile.html')
 
-#Login + Sign Up --> Vayeshnavi
+#Login + Sign Up --> Va is h navi
 @app.route('/login')
 def loggin():
     return render_template('login.html')

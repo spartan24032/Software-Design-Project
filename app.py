@@ -3,9 +3,10 @@ from flask import Flask,send_file,jsonify,render_template
 from flask_cors import CORS
 import os
 
-current_dir = os.path.dirname(__file__).strip('\server')
-path_current='\client'
-current_dir +=path_current
+current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
+path_current=r'\flask-app'
+current_dir += path_current
+print(current_dir)
 
 
 
@@ -18,7 +19,7 @@ app.config.from_object(__name__)
 
 @app.route('/')
 def homepage():
-    return render_template('index.html',image_filename='swif.jpg')
+    return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #/fuel_quote_form --> Joshua
 @app.route('/fuel_quote_form')
@@ -45,7 +46,7 @@ def sign_up():
 
 @app.route('/styles.css')
 def style_css():
-    return send_file(current_dir+r'\public\styles.css')
+    return send_file(current_dir+r'\public\css\styles.css')
 
 if __name__ == '__main__':
     app.run()

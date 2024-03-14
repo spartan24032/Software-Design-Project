@@ -22,16 +22,16 @@ def homepage():
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #/fuel_quote_form --> Joshua
-@app.route('/fuel_quote_form')
+@app.route('/quote_form')
 def fuel_quote_form():
     return render_template('quote_form.html')
 
 #fuel_quote_history --> Sahib
-@app.route('/fuel_quote_history')
+@app.route('/fuel_history')
 def fuel_quote_history():
     return render_template('fuel_history.html')
 #
-@app.route('/client_profile_management')
+@app.route('/profile')
 def profile_management():
     return render_template('profile.html')
 
@@ -46,7 +46,8 @@ def sign_up():
 
 @app.route('/styles.css')
 def style_css():
-    return send_file(current_dir+r'\public\css\styles.css')
+    print(current_dir)
+    return send_file(current_dir+r'/public/css/styles.css')
 
 if __name__ == '__main__':
     app.run()

@@ -50,5 +50,5 @@ def style_css():
     return send_file(current_dir+r'/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run(host ='0.0.0.0' )
+    app.run()
 

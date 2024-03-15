@@ -1,17 +1,16 @@
 
 from flask import Flask,send_file,jsonify,render_template
-from flask_cors import CORS
 import os
 
 current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
-path_current=r'\flask-app'
+path_current=r"/flask-app"
 current_dir += path_current
 print(current_dir)
 
 
 
 # instantiate the app
-app = Flask(__name__,template_folder=current_dir+r'\templates',static_folder =current_dir+r'\public')
+app = Flask(__name__,template_folder=current_dir+r'/templates',static_folder =current_dir+r'/public')
 #Get the absolute path from the folder
 app.config.from_object(__name__)
 
@@ -24,6 +23,7 @@ def homepage():
 #/fuel_quote_form --> Joshua
 @app.route('/quote_form')
 def fuel_quote_form():
+    print(current_dir)
     return render_template('quote_form.html')
 
 #fuel_quote_history --> Sahib
@@ -50,5 +50,5 @@ def style_css():
     return send_file(current_dir+r'/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host ='0.0.0.0' )
 

@@ -40,7 +40,10 @@
     font-weight: bold;
     color: white;
     width: 20rem;
-  }
+    background:none;
+    border:none;
+    padding:0;
+    cursor: pointer;}
 
   .navlist {
     display: flex;
@@ -227,23 +230,24 @@
 
 <body>
   <header id="header">
-    <div class="logo">
-      Vanguard Energy Co.
+
+    <div  >
+      <button class="logo" onclick="window.location.href='{{ url_for('homepage') }}'">Vanguard Energy Co.</button>
     </div>
     <nav id="navbar" style="margin-right: 1rem;">
       <ul class="navlist">
         <li class="navlist-item"><a href="/quote_form" style="text-decoration: none; cursor: pointer; color: white">File Quote</a></li>
         <li class="navlist-item"><a href="/fuel_history" style="text-decoration: none; cursor: pointer; color: white">File Quote History</a></li>
-        <li class="navlist-item"><a href="/profile" style="text-decoration: none; cursor: pointer; color: white">Profile Management</a></li>
+        <!-- <li class="navlist-item"><a href="/profile" style="text-decoration: none; cursor: pointer; color: white">Profile Management</a></li> -->
       </ul>
     </nav>
     <div class="nav-buttons" style="margin-right: 2rem;">
-      <button class="log-in button">
+      <!-- <button class="log-in button">
         <a href="/login" style="text-decoration: none; cursor: pointer; color: #2C74FF;">Log In</a>
       </button>
       <button class="sign-up button">
         <a href="/signup" style="text-decoration: none; cursor: pointer; color: white">Sign Up</a>
-      </button>
+      </button> -->
     </div>
     <!--
     <div class="settings-button">

@@ -1,98 +1,130 @@
-</body>
-</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order Form</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #ffffff;
-    margin: 0;
-    padding: 0;
-  }
-  .container {
-    max-width: 600px;
-    margin: 50px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #ffffff;
-  }
-  .form-group {
-    margin-bottom: 20px;
-  }
-  label {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  input[type="number"],
-  input[type="date"] {
-    width: calc(100% - 10px);
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-  }
-  input[type="number"]:focus,
-  input[type="date"]:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  .btn {
-    background-color: #007bff;
-    color: #ffffff;
-    border: none;
-    border-radius: 5px;
-    padding: 10px 20px;
-    cursor: pointer;
-  }
-  .btn:hover {
-    background-color: #0056b3;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+        }
+        input[type="number"],
+        input[type="text"],
+        input[type="date"] {
+            width: calc(100% - 10px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button.btn {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+            transition: background-color 0.3s ease;
+        }
+        button.btn:hover {
+            background-color: #0056b3;
+        }
+        #quoteResult {
+            margin-top: 30px;
+            text-align: center;
+        }
+        #quoteDetails {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
+    <h2>Order Form</h2>
+    <form id="orderForm">
+        <div class="form-group">
+            <label for="gallonsRequested">Gallons Requested</label>
+            <input type="number" id="gallonsRequested" name="gallonsRequested" required>
+        </div>
+        <div class="form-group">
+            <label for="deliveryAddress">Delivery Address</label>
+            <input type="text" id="deliveryAddress" name="deliveryAddress" required>
+        </div>
+        <div class="form-group">
+            <label for="deliveryDate">Delivery Date</label>
+            <input type="date" id="deliveryDate" name="deliveryDate" required>
+        </div>
+        <button type="button" onclick="getQuote()" class="btn">Get Quote</button>
+    </form>
 
-<div class="container">
-<center>
-  <h2>Order Form</h2>
-  </center>
-  <form id="orderForm">
-    <div class="form-group">
-      <label for="gallonsRequested">Gallons Requested</label>
-      <input type="number" id="gallonsRequested" name="gallonsRequested" required>
+    <div id="quoteResult" style="display: none;">
+        <h2>Quote Result</h2>
+        <div id="quoteDetails">
+            <!-- Quote details will be populated by JavaScript -->
+        </div>
+        <button type="button" onclick="submitQuote()" class="btn">Submit Quote</button>
     </div>
-    <div class="form-group">
-      <label for="deliveryAddress">Delivery Address</label>
-      <input type="text" id="deliveryAddress" name="deliveryAddress" value="123 Main St, City, State" readonly>
-    </div>
-    <div class="form-group">
-      <label for="deliveryDate">Delivery Date</label>
-      <input type="date" id="deliveryDate" name="deliveryDate" required>
-    </div>
-    <div class="form-group">
-      <label for="suggestedPrice">Suggested Price / gallon</label>
-      <input type="text" id="suggestedPrice" name="suggestedPrice" value="$2.50" readonly>
-    </div>
-    <div class="form-group">
-      <label for="totalAmountDue">Total Amount Due</label>
-      <input type="text" id="totalAmountDue" name="totalAmountDue" value="$100.00" readonly>
-    </div>
-    <center>
-    <button type="submit"
-    class="btn">Submit</button>
-    </center>
-  </form>
-</div>
 
+    <script>
+        var formData; // Store form data globally
+
+        function getQuote() {
+            formData = new FormData(document.getElementById("orderForm")); // Store form data
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/process_quote", true);
+            xhr.onload = function() {
+                if (xhr.status == 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    var quoteDetails = document.getElementById("quoteDetails");
+                    quoteDetails.innerHTML = "<p>Suggested Price / gallon: $" + response.suggestedPrice + "</p>" +
+                                              "<p>Total Amount Due: $" + response.totalAmountDue + "</p>";
+                    document.getElementById("quoteResult").style.display = "block";
+                }
+            };
+            xhr.send(formData);
+        }
+
+        function submitQuote() {
+            // Send the form data JSON to the server
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/submit_quote", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log("Quote submitted successfully");
+
+                        // Confetti animation
+                        confetti();
+
+                        // Update button text
+                        var submitButton = document.querySelector("#quoteResult button");
+                        submitButton.textContent = "Nice one broke boy";
+                        submitButton.disabled = true; // Disable button after submission
+
+                        // Handle further processing or UI update as needed
+                    } else {
+                        console.error("Error submitting quote:", xhr.responseText);
+                    }
+                }
+            };
+            xhr.send(JSON.stringify(Object.fromEntries(formData))); // Convert FormData object to JSON and send
+        }
+    </script>
 </body>
 </html>

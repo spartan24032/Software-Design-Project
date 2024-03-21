@@ -5,44 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuel Quote History</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            margin: 0;
-            padding: 0;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-            border: 2px solid #007bff;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        th, td {
-            border: 1px solid #007bff;
-            text-align: center;
-            padding: 12px;
-        }
-        th {
-            background-color: #FFFFFF;
-            color: #FFFFFF;
-            font-size: 20px;
-            font-weight: bold;
-        }
-        td {
-            background-color: #FFFFFF;
-            color: #000000;
-            font-size: 18px;
-        }
-        h2 {
-            text-align: center;
-            font-size: 36px;
-            margin-top: 0;
-            margin-bottom: 20px;
-            padding: 20px 0;
-            border-radius: 8px 8px 0 0;
-            color: #007bff;
-        }
+        /* Your CSS styles here */
     </style>
 </head>
 <body>
@@ -62,23 +25,16 @@
         </tr>
     </thead>
     <tbody>
-        <!-- Example Data, :) -->
-        <tr>
-            <td style="background-color: #e9f2ff;">Sahib Singh</td>
-            <td>321 bigandtall, Houston, TX</td>
-            <td>1000</td>
-            <td>2024-01-01</td>
-            <td>$2.69</td>
-            <td>$2690.00</td>
-        </tr>
-        <tr>
-            <td style="background-color: #e9f2ff;">Joshua Mathews</td>
-            <td>123 tenmilehike, Houston, TX</td>
-            <td>10</td>
-            <td>2024-02-10</td>
-            <td>$2.75</td>
-            <td>$27.50</td>
-        </tr>
+        {% for quote in fuel_quotes %}
+            <tr>
+                <td style="background-color: #e9f2ff;">{{ quote.clientName }}</td>
+                <td>{{ quote.clientAddress }}</td>
+                <td>{{ quote.gallonsRequested }}</td>
+                <td>{{ quote.deliveryDate }}</td>
+                <td>{{ quote.pricePerGallon }}</td>
+                <td>{{ quote.totalAmountDue }}</td>
+            </tr>
+        {% endfor %}
     </tbody>
 </table>
 

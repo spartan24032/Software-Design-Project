@@ -1,6 +1,7 @@
 # Flask/Python files
 .pytest_cache
 .env
+.coverage
 __pycache__
 .vscode
 venv

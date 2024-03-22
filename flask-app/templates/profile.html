@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-  <!--<link href="../public/css/styles.css" rel="stylesheet" type="text/css" />-->
 </head>
 <style>
   * {
@@ -62,7 +61,7 @@
 
   .nav-buttons {
     display: flex;
-    width: 24rem;
+    width: 12rem;
     justify-content: flex-end;
   }
 
@@ -180,7 +179,7 @@
   .form-label {
     display: flex;
     flex-direction: column;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0 0.5rem 0;
   }
 
   .form-input {
@@ -210,6 +209,14 @@
     border-radius: 0.5rem;
   }
 
+  .submit {
+    width: 100%; 
+    padding: 0.75rem 1.25rem 0.75rem 1.25rem; 
+    background-color: #2C74FF; 
+    border: none; 
+    border-radius: 0.25rem;
+  }
+
   .settings-button {
     width: 8rem;
   }
@@ -230,24 +237,19 @@
 
 <body>
   <header id="header">
-
-    <div  >
-      <button class="logo" onclick="window.location.href='{{ url_for('homepage') }}'">Vanguard Energy Co.</button>
+    <div style="display: flex;">
+      <a class="logo" href="/" style="text-decoration: none;">Vanguard Energy Co.</a>
     </div>
     <nav id="navbar" style="margin-right: 1rem;">
       <ul class="navlist">
         <li class="navlist-item"><a href="/quote_form" style="text-decoration: none; cursor: pointer; color: white">File Quote</a></li>
         <li class="navlist-item"><a href="/fuel_history" style="text-decoration: none; cursor: pointer; color: white">File Quote History</a></li>
-        <!-- <li class="navlist-item"><a href="/profile" style="text-decoration: none; cursor: pointer; color: white">Profile Management</a></li> -->
       </ul>
     </nav>
-    <div class="nav-buttons" style="margin-right: 2rem;">
-      <!-- <button class="log-in button">
-        <a href="/login" style="text-decoration: none; cursor: pointer; color: #2C74FF;">Log In</a>
-      </button>
+    <div class="nav-buttons" style="margin-right: 1rem;">
       <button class="sign-up button">
-        <a href="/signup" style="text-decoration: none; cursor: pointer; color: white">Sign Up</a>
-      </button> -->
+        <a href="/" style="text-decoration: none; cursor: pointer; color: white">Sign Out</a>
+      </button>
     </div>
     <!--
     <div class="settings-button">
@@ -274,162 +276,34 @@
       </ul>
     </navbar>
     <div id="edit-profile">
-      <form class="edit-form">
-        <label class="form-label" for="username">
-          Username:
+      <form class="edit-form" method="POST" action="/profile">
+          {{ form.csrf_token }}
+          {{ form.name.label(class='form-label') }}
           <div class="form-field">
-            <input class="form-input" type="text" id="username" name="username">
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
+            {{ form.name(size=50, class="form-input") }}
           </div>
-        </label>
-        <label class="form-label" for="fullname">
-          Full Name:
+          {{ form.address1.label(class='form-label') }}
           <div class="form-field">
-            <input class="form-input" type="text" id="fullname" name="fullname" required>
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
+            {{ form.address1(size=100, class="form-input") }}
           </div>
-        </label>
-        <label class="form-label" for="password">
-          Password:
+          {{ form.address2.label(class='form-label') }}
           <div class="form-field">
-            <input class="form-input" type="password" id="password" name="password" readonly>
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
+            {{ form.address2(size=100, class="form-input") }}
           </div>
-        </label>
-        <label class="form-label" for="address1">
-          Address 1:
+          {{ form.state.label(class='form-label') }}
           <div class="form-field">
-            <input class="form-input" type="text" id="address1" name="address1" required>
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
+            {{ form.state(class="form-input") }}
           </div>
-        </label>
-        <label class="form-label" for="address2">
-          Address 2:
+          {{ form.city.label(class='form-label') }}
           <div class="form-field">
-            <input class="form-input" type="text" id="address2" name="address2">
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
+            {{ form.city(size=100, class="form-input") }}
           </div>
-        </label>
-        <label class="form-label" for="states">
-          State:
+          {{ form.zipcode.label(class='form-label') }}
           <div class="form-field">
-            <select class="form-input" id="states" name="states" required>
-              <option value="AL">Alabama</option>
-              <option value="AK">Alaska</option>
-              <option value="AZ">Arizona</option>
-              <option value="AR">Arkansas</option>
-              <option value="CA">California</option>
-              <option value="CO">Colorado</option>
-              <option value="CT">Connecticut</option>
-              <option value="DE">Delaware</option>
-              <option value="FL">Florida</option>
-              <option value="GA">Georgia</option>
-              <option value="HI">Hawaii</option>
-              <option value="ID">Idaho</option>
-              <option value="IL">Illinois</option>
-              <option value="IN">Indiana</option>
-              <option value="IA">Iowa</option>
-              <option value="KS">Kansas</option>
-              <option value="KY">Kentucky</option>
-              <option value="LA">Louisiana</option>
-              <option value="ME">Maine</option>
-              <option value="MD">Maryland</option>
-              <option value="MA">Massachusetts</option>
-              <option value="MI">Michigan</option>
-              <option value="MN">Minnesota</option>
-              <option value="MS">Mississippi</option>
-              <option value="MO">Missouri</option>
-              <option value="MT">Montana</option>
-              <option value="NE">Nebraska</option>
-              <option value="NV">Nevada</option>
-              <option value="NH">New Hampshire</option>
-              <option value="NJ">New Jersey</option>
-              <option value="NM">New Mexico</option>
-              <option value="NY">New York</option>
-              <option value="NC">North Carolina</option>
-              <option value="ND">North Dakota</option>
-              <option value="OH">Ohio</option>
-              <option value="OK">Oklahoma</option>
-              <option value="OR">Oregon</option>
-              <option value="PA">Pennsylvania</option>
-              <option value="RI">Rhode Island</option>
-              <option value="SC">South Carolina</option>
-              <option value="SD">South Dakota</option>
-              <option value="TN">Tennessee</option>
-              <option value="TX">Texas</option>
-              <option value="UT">Utah</option>
-              <option value="VT">Vermont</option>
-              <option value="VA">Virginia</option>
-              <option value="WA">Washington</option>
-              <option value="WV">West Virginia</option>
-              <option value="WI">Wisconsin</option>
-              <option value="WY">Wyoming</option>
-            </select>
+            {{ form.zipcode(size=9, class="form-input") }}
           </div>
-        </label>
-        <label class="form-label" for="city">
-          City:
-          <div class="form-field">
-            <input class="form-input" type="text" id="city" name="city" required>
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
-          </div>
-        </label>
-        <label class="form-label" for="zipcode">
-          Zipcode:
-          <div class="form-field">
-            <input class="form-input" type="text" id="zipcode" name="zipcode" required>
-            <button type="button" class="edit-button">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="-2 -4 28 28" stroke-width="1.5"
-                stroke="currentColor" class="w-6 h-6">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                  d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
-              </svg>
-            </button>
-          </div>
-        </label>
-        <br>
-        <hr style="border: 1px solid #D9D9D9;">
-        <br>
-        <button type="submit" class="sign-up button"
-          style="width: 100%; padding: 0.75rem 1.25rem 0.75rem 1.25rem; background-color: #2C74FF; border: none; border-radius: 0.25rem;">
-          Save Changes
-        </button>
+        <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;">
+        {{ form.submit(class="sign-up button submit") }}
       </form>
     </div>
     <div id="delete-profile" style="display: none;">
@@ -452,7 +326,6 @@
         be removed from our system.</p>
     </div>
   </section>
-  <!--<script src="script.js"></script>-->
 </body>
 
 </html>

@@ -1,17 +1,18 @@
 
 from flask import Flask,send_file,jsonify,render_template,request,redirect,session
+from flask_wtf import FlaskForm
+from wtforms import SubmitField
 import os
 import random
+
+from validation.profile_form import ProfileForm
 
 current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
 path_current=r"/flask-app"
 current_dir += path_current
 print(current_dir)
 
-
-
 # instantiate the app
-
 app = Flask(__name__,template_folder=current_dir+r'/templates',static_folder =current_dir+r'/public')
 app.secret_key = '38hddjch82183y2f00di'
 #Get the absolute path from the folder
@@ -40,6 +41,7 @@ def random_quotes():
         quote['totalAmountDue'] = '${:.2f}'.format(quote['gallonsRequested'] * float(quote['pricePerGallon'][1:]))
         fuel_quotes.append(quote)
     return fuel_quotes
+
 #Pricing Module 
 def calculate_price(gallons_requested, delivery_state, has_history):
     # Constants
@@ -60,9 +62,6 @@ def calculate_price(gallons_requested, delivery_state, has_history):
     
     return suggested_price_per_gallon, total_amount_due
 
-
-
-
 #Routing Functions 
 @app.route('/') 
 def homepage():
@@ -82,6 +81,7 @@ def process_quote():
     has_history = True
     suggested_price_per_gallon, total_amount_due = calculate_price(gallons_requested, delivery_state, has_history)
     return jsonify({'suggestedPrice': suggested_price_per_gallon, 'totalAmountDue': total_amount_due})
+
 @app.route('/submit_quote', methods=['POST'])
 def submit_quote():
     data = request.get_json()
@@ -98,8 +98,23 @@ def submit_quote():
 def fuel_quote_history():
     #No database implementation yet
     return render_template('fuel_history.html', fuel_quotes=random_quotes())
-#
 
+
+# profile --> sebastian
+@app.route('/profile', methods=['POST', 'GET'])
+def profile_mangagement():
+    form = ProfileForm() # under the hood, request.form is passed as an argument
+    if form.validate_on_submit(): # checks if its a post request and validates
+        name = form.name.data
+        address1 = form.address1.data
+        address2 = form.address2.data
+        city = form.city.data
+        state = form.state.data
+        zipcode = form.zipcode.data
+        print(name, address1, address2, city, state, zipcode)
+        return render_template('profile.html', form=form)
+    else:
+        return render_template('profile.html', form=form)
 
 
 @app.route('/signup', methods=['POST','GET'])
@@ -120,7 +135,8 @@ def login():
         password = request.form['password']
 
         if username in users and users[username] == password:
-            return render_template ('profile.html')
+            form = ProfileForm()
+            return render_template ('profile.html', form=form)
         else:
             return '<h1>invalid credentials!</h1>'
     elif request.method == 'GET':

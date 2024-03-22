@@ -1,7 +1,6 @@
 
 from flask import Flask,send_file,jsonify,render_template,request,redirect,session
 from flask_wtf import FlaskForm
-from wtforms import SubmitField
 import os
 import random
 

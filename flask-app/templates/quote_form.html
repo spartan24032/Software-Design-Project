@@ -16,6 +16,57 @@
             text-align: center;
             margin-top: 20px;
         }
+        .form-label {
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem 0 0.5rem 0;
+  }
+        .form-container,
+        .table-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+        }
+        .table-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow-x: auto; /* Add horizontal scrolling if needed */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
         .form-group {
             margin-bottom: 20px;
         }
@@ -52,79 +103,71 @@
         #quoteDetails {
             margin-top: 20px;
         }
+        .table-container {
+            max-height: 300px; /* Adjust the maximum height as needed */
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
-    <h2>Order Form</h2>
-    <form id="orderForm">
-        <div class="form-group">
-            <label for="gallonsRequested">Gallons Requested</label>
-            <input type="number" id="gallonsRequested" name="gallonsRequested" required>
-        </div>
-        <div class="form-group">
-            <label for="deliveryAddress">Delivery Address</label>
-            <input type="text" id="deliveryAddress" name="deliveryAddress" required>
-        </div>
-        <div class="form-group">
-            <label for="deliveryDate">Delivery Date</label>
-            <input type="date" id="deliveryDate" name="deliveryDate" required>
-        </div>
-        <button type="button" onclick="getQuote()" class="btn">Get Quote</button>
-    </form>
+    <div class="form-container">
+        <h2>Order Form</h2>
+        <form id="orderForm" method="POST" action="/quote_form">
+            
+                {{ form.csrf_token }}
+                {{ form.gallons.label(class='form-label')}}
+            <div class="form-group">
+                {{ form.gallons( class="form-input") }}
+            </div>
+            {{ form.deliveryAddress.label(class='form-label')}}
+            <div class="form-group">
+                {{ form.deliveryAddress(size=100, class="form-input") }}
+            </div>
+            {{ form.deliveryDate.label(class='form-label')}}
+            <div class="form-group">
+                {{ form.deliveryDate( class="form-input") }}
+            </div>
+            <!-- <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;"> -->
+            {{ form.submit(class="sign-up button submit") }}
+        
+        </form>
 
-    <div id="quoteResult" style="display: none;">
-        <h2>Quote Result</h2>
-        <div id="quoteDetails">
-            <!-- Quote details will be populated by JavaScript -->
+        <div id="QuoteSummary"> 
+
+
+
         </div>
-        <button type="button" onclick="submitQuote()" class="btn">Submit Quote</button>
     </div>
 
-    <script>
-        var formData; // Store form data globally
 
-        function getQuote() {
-            formData = new FormData(document.getElementById("orderForm")); // Store form data
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/process_quote", true);
-            xhr.onload = function() {
-                if (xhr.status == 200) {
-                    var response = JSON.parse(xhr.responseText);
-                    var quoteDetails = document.getElementById("quoteDetails");
-                    quoteDetails.innerHTML = "<p>Suggested Price / gallon: $" + response.suggestedPrice + "</p>" +
-                                              "<p>Total Amount Due: $" + response.totalAmountDue + "</p>";
-                    document.getElementById("quoteResult").style.display = "block";
-                }
-            };
-            xhr.send(formData);
-        }
-
-        function submitQuote() {
-            // Send the form data JSON to the server
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", "/submit_quote", true);
-            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        console.log("Quote submitted successfully");
-
-                        // Confetti animation
-                        confetti();
-
-                        // Update button text
-                        var submitButton = document.querySelector("#quoteResult button");
-                        submitButton.textContent = "Nice one broke boy";
-                        submitButton.disabled = true; // Disable button after submission
-
-                        // Handle further processing or UI update as needed
-                    } else {
-                        console.error("Error submitting quote:", xhr.responseText);
-                    }
-                }
-            };
-            xhr.send(JSON.stringify(Object.fromEntries(formData))); // Convert FormData object to JSON and send
-        }
-    </script>
+    <div class="table-container" >
+        <table id="quote-history">
+            <thead>
+                <tr>
+                    <th colspan="6"><h2>Fuel Quote History</h2></th>
+                </tr>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Client Address</th>
+                    <th>Gallons Requested</th>
+                    <th>Delivery Date</th>
+                    <th>Suggested Price Per Gallon</th>
+                    <th>Total Amount Due</th>
+                </tr>
+            </thead>
+            <tbody >
+                {% for quote in fuel_quotes %}
+                    <tr>
+                        <td>{{ quote.clientName }}</td>
+                        <td>{{ quote.clientAddress }}</td>
+                        <td>{{ quote.gallonsRequested }}</td>
+                        <td>{{ quote.deliveryDate }}</td>
+                        <td>{{ quote.pricePerGallon }}</td>
+                        <td>{{ quote.totalAmountDue }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

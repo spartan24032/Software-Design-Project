@@ -5,6 +5,7 @@ import os
 import random
 
 from validation.profile_form import ProfileForm
+from validation.order_form import QuoteForm
 
 current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
 path_current=r"/flask-app"
@@ -22,6 +23,7 @@ app.config.from_object(__name__)
 #Functions to generate code/variable setting (no Database employed)
 users = {}
 def random_quotes():
+    random.seed(5)
     client_names = ['Sahib Singh', 'Joshua Mathews', 'Alice Johnson', 'Bob Smith', 'Emma Davis']
     client_addresses = ['321 bigandtall, Houston, TX', '123 tenmilehike, Houston, TX', '456 oakstreet, Dallas, TX', '789 mapleave, Austin, TX', '555 pineboulevard, San Francisco, CA']
     delivery_dates = ['2024-01-01', '2024-02-10', '2024-03-15', '2024-04-20', '2024-05-25']
@@ -66,11 +68,6 @@ def calculate_price(gallons_requested, delivery_state, has_history):
 def homepage():
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
-#/fuel_quote_form --> Joshua
-@app.route('/quote_form')
-def fuel_quote_form():
-    return render_template('quote_form.html')
-
 @app.route('/process_quote', methods=['POST'])
 def process_quote():
     print(request.form)
@@ -93,10 +90,22 @@ def submit_quote():
     return jsonify({'message': 'Quote submitted successfully'}), 200
 
 #fuel_quote_history --> Sahib
-@app.route('/fuel_history')
+
+@app.route('/get_history')
 def fuel_quote_history():
     #No database implementation yet
     return render_template('fuel_history.html', fuel_quotes=random_quotes())
+
+#/fuel_quote_form --> Joshua
+@app.route('/quote_form',methods=['POST','GET'])
+def fuel_quote_form():
+    formQ = QuoteForm()
+    if formQ.validate_on_submit():
+        gallons, address, date = formQ.gallons.data,formQ.deliveryAddress.data,formQ.deliveryDate.data
+        print(gallons,address,date)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=random_quotes())
+    else:
+        return render_template("quote_form.html",form=formQ,fuel_quotes=random_quotes())
 
 
 # profile --> sebastian
@@ -147,5 +156,5 @@ def style_css():
     return send_file(current_dir+r'/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=1)
 

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import (StringField, IntegerField, SelectField, SubmitField)
+from wtforms import (StringField, IntegerField, SelectField, SubmitField, PasswordField)
 from wtforms.validators import InputRequired, Length, NumberRange 
 
 city_pairs=[('AL','Alabama'),
@@ -54,11 +54,15 @@ city_pairs=[('AL','Alabama'),
 			('WI','Wisconsin'),
 			('WY','Wyoming')]
 
-class ProfileForm(FlaskForm):
-	name = StringField('Full Name', validators=[InputRequired(), Length(max=50)])
-	address1 = StringField('Address 1', validators=[InputRequired(), Length(max=100)])
-	address2 = StringField('Address 2', validators=[Length(max=100)])
-	city = StringField('City', validators=[InputRequired(), Length(max=100)])
-	state = SelectField('State', choices=city_pairs, validators=[InputRequired()])
-	zipcode = IntegerField('Zipcode', validators=[InputRequired(), NumberRange(min=10000, max=999999999)]) # five or nine digit zipcode
+class EditProfile(FlaskForm):
+	name = StringField('Full Name', validators=[InputRequired(message='Name is required.'), Length(max=50, message='Name cannot be more than 50 characters.')])
+	address1 = StringField('Address 1', validators=[InputRequired(message='Address 1 is required.'), Length(max=100, message='Address 1 cannot be more than 100 characters.')])
+	address2 = StringField('Address 2', validators=[Length(max=100, message='Address 2 cannot be more than 100 characters.')])
+	city = StringField('City', validators=[InputRequired(message='City is required.'), Length(max=100, message='City cannot be more than 100 characters.')])
+	state = SelectField('State', choices=city_pairs, validators=[InputRequired(message='State is required.')])
+	zipcode = IntegerField('Zipcode', validators=[InputRequired(message='Zipcode is required.'), NumberRange(min=10000, max=999999999, message='Zipcode must be 5 or 9 digits.')]) # five or nine digit zipcode
 	submit = SubmitField('Save Changes')
+
+class DeleteProfile(FlaskForm):
+	password = PasswordField('Password', validators=[InputRequired(message='Password is required')])
+	submit = SubmitField('Delete Profile')

@@ -38,5 +38,3 @@ coverage
 *.sw?
 
 *.tsbuildinfo
-
-.coverage

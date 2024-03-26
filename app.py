@@ -1,24 +1,16 @@
 
 from flask import Flask,send_file,jsonify,render_template,request,redirect,session
 from flask_wtf import FlaskForm
+from flask_app import create_app
 import os
 import random
+import config
 
-from flask_app.forms.profile_form import ProfileForm
+from flask_app.forms.profile_form import EditProfile, DeleteProfile
 
-current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
-path_current=r"/flask-app"
-current_dir += path_current
-print(current_dir)
-
-# instantiate the app
-app = Flask(__name__,template_folder=current_dir+r'/templates',static_folder =current_dir+r'/public')
-app.secret_key = '38hddjch82183y2f00di'
-#Get the absolute path from the folder
-app.config.from_object(__name__)
+app = create_app()
 
 #Create some logins:
-
 #Functions to generate code/variable setting (no Database employed)
 users = {}
 def random_quotes():
@@ -101,20 +93,37 @@ def fuel_quote_history():
 
 # profile --> sebastian
 @app.route('/profile', methods=['POST', 'GET'])
-def profile_mangagement():
-    form = ProfileForm() # under the hood, request.form is passed as an argument
-    if form.validate_on_submit(): # checks if its a post request and validates
-        name = form.name.data
-        address1 = form.address1.data
-        address2 = form.address2.data
-        city = form.city.data
-        state = form.state.data
-        zipcode = form.zipcode.data
-        print(name, address1, address2, city, state, zipcode)
-        return render_template('profile.html', form=form)
-    else:
-        return render_template('profile.html', form=form)
+def profile():
+    edit = EditProfile() # under the hood, request.form is passed as an argument
+    delete = DeleteProfile()
+    return render_template('profile.html', edit=edit, delete=delete)
 
+# profile --> sebastian
+@app.route('/profile/edit', methods=['POST'])
+def edit_profile():
+    edit = EditProfile() 
+    if edit.validate_on_submit(): # checks if it's a post request and validates
+        name = edit.name.data
+        address1 = edit.address1.data
+        address2 = edit.address2.data
+        city = edit.city.data
+        state = edit.state.data
+        zipcode = edit.zipcode.data
+        # No database implementation yet
+        print(name, address1, address2, city, state, zipcode)
+        return redirect('/profile')
+    return 
+
+# profile --> sebastian
+@app.route('/profile/delete', methods=['POST'])
+def delete_profile():
+    form = DeleteProfile()
+    if form.validate_on_submit(): 
+        password = form.password.data
+        # No database implementation yet
+        print(password)
+        return redirect('/login')
+    return
 
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
@@ -134,8 +143,9 @@ def login():
         password = request.form['password']
 
         if username in users and users[username] == password:
-            form = ProfileForm()
-            return render_template ('profile.html', form=form)
+            edit = EditProfile()
+            delete = DeleteProfile()
+            return render_template ('profile.html', edit=edit, delete=delete)
         else:
             return '<h1>invalid credentials!</h1>'
     elif request.method == 'GET':
@@ -143,8 +153,7 @@ def login():
 
 @app.route('/styles.css')
 def style_css():
-    print(current_dir)
-    return send_file(current_dir+r'/public/css/styles.css')
+    return send_file(os.path.dirname(__file__)+r'flask_app/public/css/styles.css')
 
 if __name__ == '__main__':
     app.run()

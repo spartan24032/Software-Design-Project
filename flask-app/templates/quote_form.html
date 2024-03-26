@@ -70,6 +70,39 @@
         .form-group {
             margin-bottom: 20px;
         }
+        .get-quote-num {
+    text-align: center;
+    margin-bottom: 20px; 
+    margin-top: 20px; 
+}
+.get-quote-title {
+    text-align: center;
+    margin-bottom: 20px; 
+    margin-top: 20px; 
+    font-weight: bold;
+    display: block;
+}
+.button-submit {
+    background-color: #000000;
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: block; /* Change display property to block */
+    margin: 20px auto; /* Use auto margin for centering */
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+    width: fit-content; /* Set width to fit the content */
+}
+
+/* Hover state */
+.button-submit:hover {
+    background-color: #1ad823;
+}
+
         label {
             font-weight: bold;
             display: block;
@@ -113,33 +146,37 @@
     <div class="form-container">
         <h2>Order Form</h2>
         <form id="orderForm" method="POST" action="/quote_form">
-            
-                {{ form.csrf_token }}
+            {{ form.csrf_token }}
+            <div class="form-group">
                 {{ form.gallons.label(class='form-label')}}
-            <div class="form-group">
-                {{ form.gallons( class="form-input") }}
+                {{ form.gallons(class="form-input") }}
             </div>
-            {{ form.deliveryAddress.label(class='form-label')}}
             <div class="form-group">
+                {{ form.deliveryAddress.label(class='form-label')}}
                 {{ form.deliveryAddress(size=100, class="form-input") }}
             </div>
-            {{ form.deliveryDate.label(class='form-label')}}
             <div class="form-group">
-                {{ form.deliveryDate( class="form-input") }}
+                {{ form.deliveryDate.label(class='form-label')}}
+                {{ form.deliveryDate(class="form-input") }}
+                {%  for error in form.deliveryDate.errors %}
+                <span style="color: red;">{{ error }}</span>
+            {% endfor %}
             </div>
-            <!-- <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;"> -->
-            {{ form.submit(class="sign-up button submit") }}
-        
+            <div >
+                {{ form.submit(class="button-submit") }}
+            </div>
         </form>
+        <div id="QuoteSummary"></div>
+        {% if form.price.data %}
+       <div class="get-quote-title" > Total Amount Due </div>
+      <div class="get-quote-num">${{ form.price.data[1] |string  }}</div> 
+      <div class="get-quote-title" > Suggested Price Per Gallon</div>
+      <div class="get-quote-num">${{ form.price.data[0] |string  }}</div> 
+      <!-- <button type="submit" form="/action" -->
 
-        <div id="QuoteSummary"> 
+    {% endif %}
 
-
-
-        </div>
     </div>
-
-
     <div class="table-container" >
         <table id="quote-history">
             <thead>
@@ -157,15 +194,15 @@
             </thead>
             <tbody >
                 {% for quote in fuel_quotes %}
-                    <tr>
-                        <td>{{ quote.clientName }}</td>
-                        <td>{{ quote.clientAddress }}</td>
-                        <td>{{ quote.gallonsRequested }}</td>
-                        <td>{{ quote.deliveryDate }}</td>
-                        <td>{{ quote.pricePerGallon }}</td>
-                        <td>{{ quote.totalAmountDue }}</td>
-                    </tr>
-                {% endfor %}
+                <tr>
+                    <td>{{ quote.clientName }}</td>
+                    <td>{{ quote.clientAddress }}</td>
+                    <td>{{ quote.gallonsRequested }}</td>
+                    <td>{{ quote.deliveryDate }}</td>
+                    <td>{{ quote.pricePerGallon }}</td>
+                    <td>{{ quote.totalAmountDue }}</td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
     </div>

@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 import os
 import random
 
-from validation.profile_form import ProfileForm
+from flask_app.forms.profile_form import ProfileForm
 
 current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
 path_current=r"/flask-app"

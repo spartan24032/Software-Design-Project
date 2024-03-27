@@ -1,3 +1,153 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+    }
+    h2 {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .form-label {
+display: flex;
+flex-direction: column;
+margin: 0.5rem 0 0.5rem 0;
+}
+    .form-container,
+    .table-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 20px;
+    }
+    .table-container {
+        max-width: 800px;
+        margin: 20px auto;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        overflow-x: auto; /* Add horizontal scrolling if needed */
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    tr:hover {
+        background-color: #ddd;
+    }
+
+    h2 {
+        text-align: center;
+        margin-top: 20px;
+    }
+    .form-group {
+        margin-bottom: 20px;
+    }
+    .get-quote-num {
+text-align: center;
+margin-bottom: 20px; 
+margin-top: 20px; 
+}
+.get-quote-title {
+text-align: center;
+margin-bottom: 20px; 
+margin-top: 20px; 
+font-weight: bold;
+display: block;
+}
+.button-submit {
+background-color: #000000;
+border: none;
+color: white;
+padding: 15px 32px;
+text-align: center;
+text-decoration: none;
+display: block; 
+margin: 20px auto; 
+font-size: 16px;
+cursor: pointer;
+border-radius: 8px;
+transition: background-color 0.3s ease;
+width: fit-content; 
+}
+
+.button-submit:hover {
+background-color: #1ad823;
+}
+.button-home {
+background-color: #000000;
+border: none;
+color: white;
+text-align: left;
+text-decoration: none;
+display: block; 
+font-size: 16px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+}
+
+.button-home:hover {
+background-color: #d81a1a;
+}
+
+    label {
+        font-weight: bold;
+        display: block;
+    }
+    input[type="number"],
+    input[type="text"],
+    input[type="date"] {
+        width: calc(100% - 10px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    button.btn {
+        background-color: #007bff;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        display: block;
+        margin: 0 auto;
+        transition: background-color 0.3s ease;
+    }
+    button.btn:hover {
+        background-color: #0056b3;
+    }
+    #quoteResult {
+        margin-top: 30px;
+        text-align: center;
+    }
+    #quoteDetails {
+        margin-top: 20px;
+    }
+    .table-container {
+        max-height: 300px; /* Adjust the maximum height as needed */
+        overflow-y: auto;
+    }
+</style>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,142 +155,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order Form</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.0.1/confetti.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        h2 {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .form-label {
-    display: flex;
-    flex-direction: column;
-    margin: 0.5rem 0 0.5rem 0;
-  }
-        .form-container,
-        .table-container {
-            max-width: 600px;
-            margin: 20px auto;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 20px;
-        }
-        .table-container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: #fff;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow-x: auto; /* Add horizontal scrolling if needed */
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-
-        tr:hover {
-            background-color: #ddd;
-        }
-
-        h2 {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .get-quote-num {
-    text-align: center;
-    margin-bottom: 20px; 
-    margin-top: 20px; 
-}
-.get-quote-title {
-    text-align: center;
-    margin-bottom: 20px; 
-    margin-top: 20px; 
-    font-weight: bold;
-    display: block;
-}
-.button-submit {
-    background-color: #000000;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: block; /* Change display property to block */
-    margin: 20px auto; /* Use auto margin for centering */
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.3s ease;
-    width: fit-content; /* Set width to fit the content */
-}
-
-/* Hover state */
-.button-submit:hover {
-    background-color: #1ad823;
-}
-
-        label {
-            font-weight: bold;
-            display: block;
-        }
-        input[type="number"],
-        input[type="text"],
-        input[type="date"] {
-            width: calc(100% - 10px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button.btn {
-            background-color: #007bff;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-            display: block;
-            margin: 0 auto;
-            transition: background-color 0.3s ease;
-        }
-        button.btn:hover {
-            background-color: #0056b3;
-        }
-        #quoteResult {
-            margin-top: 30px;
-            text-align: center;
-        }
-        #quoteDetails {
-            margin-top: 20px;
-        }
-        .table-container {
-            max-height: 300px; /* Adjust the maximum height as needed */
-            overflow-y: auto;
-        }
-    </style>
+    <button id ="return-home" class ="button-home"> Go Back</button>
+    
 </head>
 <body>
     <div class="form-container">
@@ -165,16 +181,17 @@
             <div >
                 {{ form.submit(class="button-submit") }}
             </div>
+            <div id="QuoteSummary"></div>
+            {% if form.price.data %}
+           <div class="get-quote-title" > Total Amount Due </div>
+          <div id ="total_amount" class="get-quote-num">${{ form.price.data[1] |string  }}</div> 
+          <div class="get-quote-title" > Suggested Price Per Gallon</div>
+          <div id ="suggested-price" class="get-quote-num">${{ form.price.data[0] |string  }}</div> 
+          <button id="sendButton" class ='reset-button'>Send Values </button>
+    
+        {% endif %}
         </form>
-        <div id="QuoteSummary"></div>
-        {% if form.price.data %}
-       <div class="get-quote-title" > Total Amount Due </div>
-      <div class="get-quote-num">${{ form.price.data[1] |string  }}</div> 
-      <div class="get-quote-title" > Suggested Price Per Gallon</div>
-      <div class="get-quote-num">${{ form.price.data[0] |string  }}</div> 
-      <!-- <button type="submit" form="/action" -->
-
-    {% endif %}
+  
 
     </div>
     <div class="table-container" >
@@ -208,3 +225,42 @@
     </div>
 </body>
 </html>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    $("#return-home").click(function(){
+        window.location.href = "/profile";
+    });
+});
+$(document).ready(function() {
+    $('#sendButton').click(function() {
+       
+        var totalAmount = $('#total_amount').text().trim();
+        var suggestedPrice = $('#suggested-price').text().trim();
+        var gallons = $('#gallons').val().trim();
+        var address = $('#deliveryAddress').val().trim();
+        var date = $('#deliveryDate').val().trim();
+        $.ajax({
+            url: '/finalize_value',
+            method: 'POST', 
+            data: {
+                totalAmount: totalAmount,
+                suggestedPrice: suggestedPrice,
+                gallons :gallons,
+                date :date,
+                address:address
+            },
+            success: function(response) {
+                alert('Success on the Purchase!');
+                window.location.href = "/quote_form";
+                
+                console.log('Container content sent successfully');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error sending container content: ' + error);
+            }
+        });
+    });
+});
+</script>

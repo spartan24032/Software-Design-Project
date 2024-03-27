@@ -1,5 +1,6 @@
 
 from flask import Flask,send_file,jsonify,render_template,request,redirect,session
+from werkzeug.datastructures import ImmutableMultiDict
 from flask_wtf import FlaskForm
 import os
 import random
@@ -30,23 +31,12 @@ def random_quote():
     return  fuel_quotes
 
 
-def calculate_price(gallons_requested, delivery_state, has_history):
-    current_price_per_gallon = 1.50
-    location_factor = 0.02 if 'Texas' in delivery_state else 0.04
-    rate_history_factor = 0.01 if has_history else 0
-    gallons_requested_factor = 0.02 if gallons_requested > 1000 else 0.03
-    company_profit_factor = 0.10
-    margin = (location_factor - rate_history_factor + gallons_requested_factor + company_profit_factor) * current_price_per_gallon
-    suggested_price_per_gallon = current_price_per_gallon + margin
-    total_amount_due = gallons_requested * suggested_price_per_gallon
-    return suggested_price_per_gallon, total_amount_due
-
 #Routing Functions 
 @app.route('/') 
 def homepage():
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
-#/fuel_quote_form --> Joshua
+#Landing Page for the Order Form 
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
     formQ = QuoteForm()
@@ -59,6 +49,16 @@ def fuel_quote_form():
         return render_template("quote_form.html",form=formQ,fuel_quotes=random_quote())
     else:
         return render_template("quote_form.html",form=formQ,fuel_quotes=random_quote())
+@app.route('/finalize_value',methods=['POST'])
+def confirm_quote():
+    if request.method == "POST":
+        data_incoming = request.form
+        Total_Amount = data_incoming.get('totalAmount').strip('$')
+        Suggested_Price = data_incoming.get('suggestedPrice').strip('$')
+        Gallons = data_incoming.get('gallons')
+        Date = data_incoming.get('date')
+        Address = data_incoming.get('address')
+    return 'Success',200
 
 
 # profile --> sebastian

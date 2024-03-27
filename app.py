@@ -8,25 +8,21 @@ import random
 import config
 
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
-
-app = create_app()
-
-from validation.profile_form import ProfileForm
-from validation.order_form import QuoteForm
-
+from flask_app.forms.order_form import QuoteForm
 
 from PricingModel import Calculation
 
-current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
-path_current=r"/flask-app"
-current_dir += path_current
-print(current_dir)
+app = create_app()
 
-# instantiate the app
-app = Flask(__name__,template_folder=current_dir+r'/templates',static_folder =current_dir+r'/public')
-app.secret_key = '38hddjch82183y2f00di'
-#Get the absolute path from the folder
-app.config.from_object(__name__)
+# current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
+# path_current=r"\flask-app"
+# current_dir += path_current
+
+# # instantiate the app
+# app = Flask(__name__,template_folder=current_dir+r'/templates',static_folder =current_dir+r'/public')
+# app.secret_key = '38hddjch82183y2f00di'
+# #Get the absolute path from the folder
+# app.config.from_object(__name__)
 
 users = {}
 fuel_quotes = [
@@ -47,6 +43,7 @@ def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, 
 #Routing Functions 
 @app.route('/') 
 def homepage():
+    #print(current_dir)
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #Landing Page for the Order Form 
@@ -140,5 +137,5 @@ def style_css():
     return send_file(os.path.dirname(__file__)+r'flask_app/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run(debug=1)
+    app.run()
 

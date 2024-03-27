@@ -23,13 +23,20 @@ app.secret_key = '38hddjch82183y2f00di'
 app.config.from_object(__name__)
 
 users = {}
-def random_quote():
-    fuel_quotes = [
+fuel_quotes = [
         {'clientName': 'Sahib Singh', 'clientAddress': '321 bigandtall, Houston, TX', 'gallonsRequested': 5, 'deliveryDate': '2024-01-01', 'pricePerGallon': '3.00', 'totalAmountDue': '$15.00'},
         {'clientName': 'John Doe', 'clientAddress': '123 Elm St, New York, NY', 'gallonsRequested': 10, 'deliveryDate': '2024-01-15', 'pricePerGallon': '2.75', 'totalAmountDue': '$27.50'}
     ]
-    return  fuel_quotes
-
+def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
+    new_quote = {
+        'clientName': client_name,
+        'clientAddress': client_address,
+        'gallonsRequested': gallons_requested,
+        'deliveryDate': delivery_date,
+        'pricePerGallon': price_per_gallon,
+        'totalAmountDue': total_amount_due
+    }
+    fuel_quotes.append(new_quote)
 
 #Routing Functions 
 @app.route('/') 
@@ -41,14 +48,13 @@ def homepage():
 def fuel_quote_form():
     formQ = QuoteForm()
     if request.method =="GET":
-         return render_template("quote_form.html",form=formQ,fuel_quotes=random_quote())
+         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
     if formQ.validate_on_submit():
         gallons, address, date = formQ.gallons.data,formQ.deliveryAddress.data,formQ.deliveryDate.data
-        Price = Calculation.Price(gallons,'Texas',False)
-        formQ.price.data =Price
-        return render_template("quote_form.html",form=formQ,fuel_quotes=random_quote())
+        formQ.price.data  = Calculation.Price(gallons,'Texas',False)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
     else:
-        return render_template("quote_form.html",form=formQ,fuel_quotes=random_quote())
+        return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
 @app.route('/finalize_value',methods=['POST'])
 def confirm_quote():
     if request.method == "POST":
@@ -58,6 +64,8 @@ def confirm_quote():
         Gallons = data_incoming.get('gallons')
         Date = data_incoming.get('date')
         Address = data_incoming.get('address')
+        add_fuel_quote(fuel_quotes, 'New Name', Address, Gallons, Date, Suggested_Price, Total_Amount)
+
     return 'Success',200
 
 

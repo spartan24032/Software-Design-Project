@@ -1,0 +1,81 @@
+body {
+    font-family: 'Inter', sans-serif; /* Specify Inter font */
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+}
+
+.login-container,
+.signup-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.login-form h2,
+.signup-form h2 {
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"] {
+    width: 375px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.form-group button {
+    width: 100%;
+    padding: 10px;
+    background-color: #2c74ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-group button:hover {
+    background-color: #add8e6;
+}
+
+
+.signup-link-container {
+    text-align: center;
+}
+
+.signup-link {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+.signup-link:hover {
+    color: #333;
+}
+
+.login-link-container {
+    text-align: center;
+}
+
+.login-link {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+}
+
+.login-link:hover {
+    color: #333;
+}

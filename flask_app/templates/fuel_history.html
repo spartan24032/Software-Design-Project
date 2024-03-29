@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Quote History</title>
+    <style>
+        /* Your CSS styles here */
+    </style>
+</head>
+<body>
+
+<table>
+    <thead>
+        <tr>
+            <th colspan="6"><h2>Fuel Quote History</h2></th>
+        </tr>
+        <tr>
+            <th style="background-color: #007bff; color: #FFFFFF;">Client Name</th>
+            <th style="background-color: #007bff; color: #FFFFFF;">Client Address</th>
+            <th style="background-color: #007bff; color: #FFFFFF;">Gallons Requested</th>
+            <th style="background-color: #007bff; color: #FFFFFF;">Delivery Date</th>
+            <th style="background-color: #007bff; color: #FFFFFF;">Suggested Price Per Gallon</th>
+            <th style="background-color: #007bff; color: #FFFFFF;">Total Amount Due</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quote in fuel_quotes %}
+            <tr>
+                <td style="background-color: #e9f2ff;">{{ quote.clientName }}</td>
+                <td>{{ quote.clientAddress }}</td>
+                <td>{{ quote.gallonsRequested }}</td>
+                <td>{{ quote.deliveryDate }}</td>
+                <td>{{ quote.pricePerGallon }}</td>
+                <td>{{ quote.totalAmountDue }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+</body>
+</html>

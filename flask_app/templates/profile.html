@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Profile Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif;
+  }
+
+  #header {
+    position: relative;
+    top: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    height: 3rem;
+    background-color: #2C74FF;
+    box-shadow: 0px 2px 5px #888888;
+  }
+
+  #navbar {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .logo {
+    margin: 0 0.5rem 0 1rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+    width: 20rem;
+    background:none;
+    border:none;
+    padding:0;
+    cursor: pointer;}
+
+  .navlist {
+    display: flex;
+    list-style: none;
+    justify-content: flex-end;
+    width: fit-content;
+  }
+
+  .navlist-item {
+    font-size: 1.2rem;
+    margin: 0 0.5rem 0 0.5rem;
+    list-style: none;
+    color: white;
+    font-weight: bold;
+  }
+
+  .nav-buttons {
+    display: flex;
+    width: 12rem;
+    justify-content: flex-end;
+  }
+
+  .nav-buttons button {
+    padding: 0.5rem 1.75rem 0.5rem 1.75rem;
+    border-radius: 0.25rem;
+    border: none;
+  }
+
+  .log-in {
+    background-color: white;
+    margin: 0 0.5rem 0 0.25rem;
+    color: #2C74FF;
+    font-weight: bold;
+  }
+
+  .sign-up {
+    background-color: #181B6A;
+    margin: 0 0.25rem 0 0;
+    color: white;
+    font-weight: bold;
+  }
+
+  .log-out {
+    width: 100%;
+    padding: 0.5rem 1.75rem 0.5rem 1.75rem;
+    border: none;
+    background-color: white;
+    margin: 1rem 0.5rem 0 0.5rem;
+    color: #2C74FF;
+    font-weight: bold;
+    border-radius: 0.25rem;
+  }
+
+  #profile-management {
+    display: flex;
+    flex-direction: column;
+    background-color: #F9FBFF;
+    padding-top: 2rem;
+  }
+
+  .profile-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2C74FF;
+    margin-left: 4rem;
+  }
+
+  .profile-nav {
+    display: flex;
+    width: 100%;
+    height: 3rem;
+  }
+
+  .profile-nav-list {
+    display: flex;
+    align-items: center;
+    background-color: #2C74FF;
+    width: 100%;
+    padding-left: 3.5rem;
+  }
+
+  .profile-nav-item {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0 0.25rem 0 0.25rem;
+    list-style: none;
+    color: white;
+    padding: 0.75rem;
+  }
+
+  .profile-nav-item-active {
+    color: #2C74FF;
+    background-color: white;
+    border-radius: 0;
+  }
+
+  #edit-profile {
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    width: 20rem;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.5rem;
+    background-color: white;
+    margin: 2.5rem 0 2rem 4rem;
+  }
+
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+  }
+
+  #delete-profile {
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    width: 20rem;
+    border: 1px solid #D9D9D9;
+    border-radius: 0.5rem;
+    background-color: white;
+    margin: 2.5rem 0 2rem 4rem;
+  }
+
+  .delete-form {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+  }
+
+  .form-field {
+    display: flex;
+    margin-top: 0.5rem;
+  }
+
+  .form-label {
+    display: flex;
+    flex-direction: column;
+    margin: 0.5rem 0 0.5rem 0;
+  }
+
+  .form-input {
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: 0.3rem;
+    width: 100%;
+    background-color: #F9FBFF;
+    display: inline-block;
+    border: 1px solid #D9D9D9;
+  }
+
+  .edit-button {
+    padding: 0 0.5rem 0 0.5rem;
+    width: 3rem;
+    border-radius: 0.3rem;
+    margin: 0;
+    background-color: white;
+    display: inline-block;
+    border: 1px solid #D9D9D9;
+  }
+
+  .delete-warning {
+    margin-top: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #D9D9D9;
+    background-color: #F9FBFF;
+    border-radius: 0.5rem;
+  }
+
+  .submit {
+    width: 100%; 
+    padding: 0.75rem 1.25rem 0.75rem 1.25rem; 
+    background-color: #2C74FF; 
+    border: none; 
+    border-radius: 0.25rem;
+  }
+
+  .delete-submit {
+    width: 100%; 
+    padding: 0.75rem 1.25rem 0.75rem 1.25rem; 
+    background-color: #F94F4F; 
+    border: none; 
+    border-radius: 0.25rem;
+  }
+
+  .settings-button {
+    width: 8rem;
+  }
+
+  .settings-dropdown {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 5rem;
+    width: 10rem;
+    padding: 0.75rem;
+    top: 3rem;
+    right: 0;
+    background-color: #2C74FF;
+  }
+</style>
+
+<body>
+  <header id="header">
+    <div style="display: flex;">
+      <a class="logo" href="/" style="text-decoration: none;">Vanguard Energy Co.</a>
+    </div>
+    <nav id="navbar" style="margin-right: 1rem;">
+      <ul class="navlist">
+        <li class="navlist-item"><a href="/quote_form" style="text-decoration: none; cursor: pointer; color: white">File Quote Management</a></li>
+      </ul>
+    </nav>
+    <div class="nav-buttons" style="margin-right: 1rem;">
+      <button class="sign-up button">
+        <a href="/" style="text-decoration: none; cursor: pointer; color: white">Sign Out</a>
+      </button>
+    </div>
+  </header>
+  <section id="profile-management">
+    <span class="profile-title">Profile Settings</span>
+    <navbar class="profile-nav">
+      <ul class="profile-nav-list">
+        <li class="profile-nav-item profile-nav-item-active" id="edit-profile-link">Edit Profile</li>
+        <li class="profile-nav-item" id="delete-profile-link">Delete Profile</li>
+      </ul>
+    </navbar>
+    <div id="edit-profile">
+      <form class="edit-form" method="POST" action="/profile">
+          {{ edit.csrf_token }}
+          {{ edit.name.label(class='form-label') }}
+          <div class="form-field">
+            {{ edit.name(size=50, class="form-input") }}
+          </div>
+          {{ edit.address1.label(class='form-label') }}
+          <div class="form-field">
+            {{ edit.address1(size=100, class="form-input") }}
+          </div>
+          {{ edit.address2.label(class='form-label') }}
+          <div class="form-field">
+            {{ edit.address2(size=100, class="form-input") }}
+          </div>
+          {{ edit.state.label(class='form-label') }}
+          <div class="form-field">
+            {{ edit.state(class="form-input") }}
+          </div>
+          {{ edit.city.label(class='form-label') }}
+          <div class="form-field">
+            {{ edit.city(size=100, class="form-input") }}
+          </div>
+          {{ edit.zipcode.label(class='form-label') }}
+          <div class="form-field">
+            {{ edit.zipcode(size=9, class="form-input") }}
+          </div>
+        <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;">
+        {{ edit.submit(class="sign-up button submit") }}
+      </form>
+    </div>
+    <div id="delete-profile" style="display: none;">
+      <form class="delete-form">
+          {{ delete.csrf_token }}
+          {{ delete.password.label(class='form-label') }}
+          <div class="form-field">
+            {{ delete.password(class='form-input') }}
+          </div>
+      </form>
+      <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;">
+      {{ delete.submit(class='sign-up button delete-submit')}}
+      <p class="delete-warning">Once deleted, there is no way to restore your information! All of your information will be removed from our system.</p>
+    </div>
+  </section>
+</body>
+
+</html>

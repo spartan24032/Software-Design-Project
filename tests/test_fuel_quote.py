@@ -50,6 +50,7 @@ def test_quoteForm_invalid_data(test_client):
             deliveryDate=date.today().replace(year=date.today().year - 1)  # Past date (invalid)
         )
         assert not form.validate()
+    
 
 
 

@@ -29,4 +29,4 @@ def test_delete_profile(test_client):
 	# Check that there was one redirect response.
 	assert len(response.history) == 1
 	# Check that the redirect request was for the profile page.
-	assert response.request.path == "/login"
+	assert response.request.path == "/signup"

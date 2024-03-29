@@ -6,7 +6,7 @@ from flask_app import create_app
 import os
 import random
 import config
-
+from flask_app.forms.login_signup import LoginForm, SignupForm
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
 from flask_app.forms.order_form import QuoteForm
 
@@ -79,9 +79,9 @@ def profile():
     delete = DeleteProfile()
     return render_template('profile.html', edit=edit, delete=delete)
 
-# profile --> sebastian
 @app.route('/profile/edit', methods=['POST'])
 def edit_profile():
+    print('Here')
     edit = EditProfile() 
     if edit.validate_on_submit(): # checks if it's a post request and validates
         name = edit.name.data
@@ -93,33 +93,48 @@ def edit_profile():
         # No database implementation yet
         print(name, address1, address2, city, state, zipcode)
         return redirect('/profile')
-    return 
+    else:
+        return render_template('profile.html', edit=edit, delete=DeleteProfile())
 
 # profile --> sebastian
 @app.route('/profile/delete', methods=['POST'])
 def delete_profile():
-    form = DeleteProfile()
-    if form.validate_on_submit(): 
-        password = form.password.data
+    delete = DeleteProfile()
+    if delete.validate_on_submit(): 
+        password = delete.password.data
         # No database implementation yet
         print(password)
-        return redirect('/login')
-    return
-
+        return redirect('/signup')
+    else:
+        return render_template('profile.html', edit=EditProfile(), delete=delete)
+# @app.route('/signup', methods=['POST','GET'])
+# def sign_up():
+#     if request.method == 'POST':
+#         username = request.form['username']
+#         password = request.form['password']
+#         users[username] = password
+#         return render_template('login.html')
+#     elif request.method == 'GET':
+#         return render_template('signup.html')
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+    formS = SignupForm() 
+    #print(formS.confirm_password)
+    if formS.validate_on_submit():
+        username = formS.username.data
+        password = formS.password.data
         users[username] = password
-        return render_template('login.html')
-    elif request.method == 'GET':
-        return render_template('signup.html')
+        print(3)
+        return render_template('login.html', form=LoginForm())
+    else:
+        print(2)
+        return render_template('signup.html', form=formS)
 
 #add the links to redirect sign in 
 @app.route('/login', methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
+    form = LoginForm()
+    if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
 
@@ -129,8 +144,8 @@ def login():
             return render_template ('profile.html', edit=edit, delete=delete)
         else:
             return '<h1>invalid credentials!</h1>'
-    elif request.method == 'GET':
-        return render_template('login.html')
+    else:
+        return render_template('login.html',form=form)
 
 @app.route('/styles.css')
 def style_css():

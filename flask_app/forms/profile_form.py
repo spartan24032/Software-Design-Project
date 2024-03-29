@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import (StringField, IntegerField, SelectField, SubmitField, PasswordField)
-from wtforms.validators import InputRequired, Length, NumberRange 
+from wtforms.validators import InputRequired, Length, NumberRange ,ValidationError
 
 city_pairs=[('AL','Alabama'),
 			('AK','Alaska'),
@@ -60,8 +60,12 @@ class EditProfile(FlaskForm):
 	address2 = StringField('Address 2', validators=[Length(max=100, message='Address 2 cannot be more than 100 characters.')])
 	city = StringField('City', validators=[InputRequired(message='City is required.'), Length(max=100, message='City cannot be more than 100 characters.')])
 	state = SelectField('State', choices=city_pairs, validators=[InputRequired(message='State is required.')])
-	zipcode = IntegerField('Zipcode', validators=[InputRequired(message='Zipcode is required.'), NumberRange(min=10000, max=999999999, message='Zipcode must be 5 or 9 digits.')]) # five or nine digit zipcode
+	zipcode = IntegerField('Zipcode', validators=[InputRequired(message='Zipcode is required.')]) # five or nine digit zipcode
+	#NumberRange(min=10000, max=999999999, message='Zipcode must be 5 or 9 digits.')
 	submit = SubmitField('Save Changes')
+	def validate_zipcode(self, zipcode):
+		if not (len((str(zipcode.data))) in [5,9]):
+			raise ValidationError('Zipcode must be 5 or 9 digits')
 
 class DeleteProfile(FlaskForm):
 	password = PasswordField('Password', validators=[InputRequired(message='Password is required')])

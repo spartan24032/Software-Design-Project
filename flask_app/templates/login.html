@@ -1,3 +1,4 @@
+<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,3 +30,41 @@
     </div>
 </body>
 </html>
+
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../public/css/styles.css">
+</head>
+
+<body>
+    <div class="login-container">
+        <form method="POST" action="/login" class="login-form">
+            <h2>Login</h2>
+            {{ form.csrf_token }}
+            <div class="form-field">
+                {{ form.username.label(class='form-label') }}
+                {{ form.username(size=50, class="form-input") }}
+            </div>
+            <div class="form-field">
+                {{ form.password.label(class='form-label') }}
+                {{ form.password(size=50, class="form-input") }}
+            </div>
+            <div class="form-field">
+                {{ form.submit(class="sign-up button submit") }}
+            </div>
+        </form>
+        <div class="signup-link-container">
+            <a href="/signup" class="signup-link">Don't have an account? Sign Up Now!</a>
+        </div>
+    </div>
+</body>
+
+</html>
+

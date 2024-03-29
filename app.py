@@ -4,6 +4,7 @@ from flask_wtf import FlaskForm
 import os
 import random
 
+from validation.login_signup import LoginForm, SignupForm
 from validation.profile_form import ProfileForm
 
 current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
@@ -18,6 +19,7 @@ app.secret_key = '38hddjch82183y2f00di'
 app.config.from_object(__name__)
 
 #Create some logins:
+
 
 #Functions to generate code/variable setting (no Database employed)
 users = {}
@@ -115,24 +117,38 @@ def profile_mangagement():
     else:
         return render_template('profile.html', form=form)
 
-
+'''
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
-    if request.method == 'POST':
+    form = SignupForm() 
+    if form.validate_on_submit() and request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
         users[username] = password
         return render_template('login.html')
     elif request.method == 'GET':
         return render_template('signup.html')
+'''
+@app.route('/signup', methods=['POST','GET'])
+def sign_up():
+    form = SignupForm() 
+    if form.validate_on_submit() and request.method == 'POST':
+        username = form.username.data
+        password = form.password.data
+        users[username] = password
+        return render_template('login.html', form=LoginForm())
+    elif request.method == 'GET':
+        return render_template('signup.html', form=form)
 
 #add the links to redirect sign in 
+    '''
 @app.route('/login', methods=['POST','GET'])
 def login():
-    if request.method == 'POST':
+    form = LoginForm()
+    if form.validate_on_submit() and request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
+        
         if username in users and users[username] == password:
             form = ProfileForm()
             return render_template ('profile.html', form=form)
@@ -140,6 +156,21 @@ def login():
             return '<h1>invalid credentials!</h1>'
     elif request.method == 'GET':
         return render_template('login.html')
+        '''
+@app.route('/login', methods=['POST','GET'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit() and request.method == 'POST':
+        username = form.username.data
+        password = form.password.data
+        
+        if username in users and users[username] == password:
+            form = ProfileForm()
+            return render_template('profile.html', form=form)
+        else:
+            return '<h1>invalid credentials!</h1>'
+    return render_template('login.html', form=form)
+
 
 @app.route('/styles.css')
 def style_css():

@@ -57,16 +57,27 @@ city_pairs=[('AL','Alabama'),
 class EditProfile(FlaskForm):
 	name = StringField('Full Name', validators=[InputRequired(message='Name is required.'), Length(max=50, message='Name cannot be more than 50 characters.')])
 	address1 = StringField('Address 1', validators=[InputRequired(message='Address 1 is required.'), Length(max=100, message='Address 1 cannot be more than 100 characters.')])
-	address2 = StringField('Address 2', validators=[Length(max=100, message='Address 2 cannot be more than 100 characters.')])
+	address2 = StringField('Address 2 (Optional)', validators=[Length(max=100, message='Address 2 cannot be more than 100 characters.')])
 	city = StringField('City', validators=[InputRequired(message='City is required.'), Length(max=100, message='City cannot be more than 100 characters.')])
 	state = SelectField('State', choices=city_pairs, validators=[InputRequired(message='State is required.')])
-	zipcode = IntegerField('Zipcode', validators=[InputRequired(message='Zipcode is required.')]) # five or nine digit zipcode
-	#NumberRange(min=10000, max=999999999, message='Zipcode must be 5 or 9 digits.')
-	submit = SubmitField('Save Changes')
+	zipcode = IntegerField('Zipcode', validators=[InputRequired(message='Zipcode is required.')])
+	editSubmit = SubmitField('Save Changes')
+	def validate_name(self, name):
+		if not len(name.data) <= 50:
+			raise ValidationError('Name cannot be more than 50 characters.')
+	def validate_address1(self, address1):
+		if not len(address1.data) <= 50:
+			raise ValidationError('Address 1 cannot be more than 100 characters.')
+	def validate_address2(self, address2):
+		if not len(address2.data) <= 100:
+			raise ValidationError('Address 2 cannot be more than 100 characters.')
+	def validate_city(self, city):
+		if not len(city.data) <= 100:
+			raise ValidationError('City cannot be more than 100 characters.')
 	def validate_zipcode(self, zipcode):
 		if not (len((str(zipcode.data))) in [5,9]):
-			raise ValidationError('Zipcode must be 5 or 9 digits')
+			raise ValidationError('Zipcode must be 5 or 9 digits.')
 
 class DeleteProfile(FlaskForm):
 	password = PasswordField('Password', validators=[InputRequired(message='Password is required')])
-	submit = SubmitField('Delete Profile')
+	deleteSubmit = SubmitField('Delete Profile')

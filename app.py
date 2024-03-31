@@ -14,16 +14,6 @@ from PricingModel import Calculation
 
 app = create_app()
 
-# current_dir = os.path.dirname(__file__) # current_dir = os.path.dirname(__file__).strip('\server')
-# path_current=r"\flask-app"
-# current_dir += path_current
-
-# # instantiate the app
-# app = Flask(__name__,template_folder=current_dir+r'/templates',static_folder =current_dir+r'/public')
-# app.secret_key = '38hddjch82183y2f00di'
-# #Get the absolute path from the folder
-# app.config.from_object(__name__)
-
 users = {}
 fuel_quotes = [
         {'clientName': 'Sahib Singh', 'clientAddress': '321 bigandtall, Houston, TX', 'gallonsRequested': 5, 'deliveryDate': '2024-01-01', 'pricePerGallon': '3.00', 'totalAmountDue': '$15.00'},
@@ -81,7 +71,6 @@ def profile():
 
 @app.route('/profile/edit', methods=['POST'])
 def edit_profile():
-    print('Here')
     edit = EditProfile() 
     if edit.validate_on_submit(): # checks if it's a post request and validates
         name = edit.name.data
@@ -124,10 +113,8 @@ def sign_up():
         username = formS.username.data
         password = formS.password.data
         users[username] = password
-        print(3)
         return render_template('login.html', form=LoginForm())
     else:
-        print(2)
         return render_template('signup.html', form=formS)
 
 #add the links to redirect sign in 

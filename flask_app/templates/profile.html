@@ -24,7 +24,7 @@
     width: 100%;
     height: 3rem;
     background-color: #2C74FF;
-    box-shadow: 0px 2px 5px #888888;
+    /*box-shadow: 0px 2px 5px #888888;*/
   }
 
   #navbar {
@@ -101,6 +101,8 @@
     flex-direction: column;
     background-color: #F9FBFF;
     padding-top: 2rem;
+    min-height: 100vh;
+    max-height: fit-content;
   }
 
   .profile-title {
@@ -119,23 +121,23 @@
   .profile-nav-list {
     display: flex;
     align-items: center;
-    background-color: #2C74FF;
     width: 100%;
     padding-left: 3.5rem;
+    border-bottom: 1px solid #D9D9D9;
   }
 
   .profile-nav-item {
     font-size: 1.25rem;
-    font-weight: bold;
     margin: 0 0.25rem 0 0.25rem;
     list-style: none;
-    color: white;
+    color: #0e0e10;
     padding: 0.75rem;
   }
 
   .profile-nav-item-active {
     color: #2C74FF;
-    background-color: white;
+    border-bottom: 3px solid #2C74FF;
+    font-weight: bold;
     border-radius: 0;
   }
 
@@ -179,7 +181,7 @@
   .form-label {
     display: flex;
     flex-direction: column;
-    margin: 0.5rem 0 0.5rem 0;
+    margin: 0.5rem 0 0 0;
   }
 
   .form-input {
@@ -241,6 +243,32 @@
     right: 0;
     background-color: #2C74FF;
   }
+
+  .error {
+    font-weight: normal;
+    font-size: 0.6rem;
+    color: #F94F4F;
+    border: 1px solid #F94F4F;
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+    margin: 0.5rem 0 0 0;
+    background-color: #FFF6F6;
+  }
+
+  .input-error {
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: 0.3rem;
+    width: 100%;
+    background-color: #F9FBFF;
+    display: inline-block;
+    border: 1px solid #F94F4F;
+  }
+
+  .hr {
+    border: 1px solid #D9D9D9;
+    margin: 1rem 0 1rem 0;
+  }
+
 </style>
 
 <body>
@@ -260,60 +288,132 @@
     </div>
   </header>
   <section id="profile-management">
-    <span class="profile-title">Profile Settings</span>
     <navbar class="profile-nav">
       <ul class="profile-nav-list">
-        <li class="profile-nav-item profile-nav-item-active" id="edit-profile-link">Edit Profile</li>
-        <li class="profile-nav-item" id="delete-profile-link">Delete Profile</li>
+        <li class="profile-nav-item profile-nav-item-active" id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
+        <li class="profile-nav-item" id="delete-profile-link"  onclick="switchForm('delete-profile-link')">Delete Profile</li>
       </ul>
     </navbar>
-    <div id="edit-profile">
+    <div id="edit-profile" style="display: flex; flex-direction: column;">
       <form class="edit-form" method="POST" action="/profile/edit">
           {{ edit.csrf_token }}
           {{ edit.name.label(class='form-label') }}
           <div class="form-field">
-            {{ edit.name(size=50, class="form-input") }}
+            {% if edit.name.errors %}
+              {{ edit.name(size=50, class="input-error") }}
+            {% else %}
+              {{ edit.name(size=50, class="form-input") }}
+            {% endif %}
           </div>
+          {% for error in edit.name.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
           {{ edit.address1.label(class='form-label') }}
           <div class="form-field">
-            {{ edit.address1(size=100, class="form-input") }}
+            {% if edit.address1.errors %}
+              {{ edit.address1(size=100, class="input-error") }}
+            {% else %}
+              {{ edit.address1(size=100, class="form-input") }}
+            {% endif %}
           </div>
+          {% for error in edit.address1.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
           {{ edit.address2.label(class='form-label') }}
           <div class="form-field">
-            {{ edit.address2(size=100, class="form-input") }}
+            {% if edit.address2.errors %}
+              {{ edit.address2(size=100, class="input-error") }}
+            {% else %}
+              {{ edit.address2(size=100, class="form-input") }}
+            {% endif %}
           </div>
+          {% for error in edit.address2.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
           {{ edit.state.label(class='form-label') }}
           <div class="form-field">
-            {{ edit.state(class="form-input") }}
+            {% if edit.state.errors %}
+              {{ edit.state(class="input-error") }}
+            {% else %}
+              {{ edit.state(class="form-input") }}
+            {% endif %}
           </div>
+          {% for error in edit.state.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
           {{ edit.city.label(class='form-label') }}
           <div class="form-field">
-            {{ edit.city(size=100, class="form-input") }}
+            {% if edit.city.errors %}
+              {{ edit.city(size=100, class="input-error") }}
+            {% else %}
+              {{ edit.city(size=100, class="form-input") }}
+            {% endif %}
           </div>
+          {% for error in edit.city.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
           {{ edit.zipcode.label(class='form-label') }}
           <div class="form-field">
-            {{ edit.zipcode(size=9, class="form-input") }}
+            {% if edit.zipcode.errors %}
+              {{ edit.zipcode(size=5, class="input-error") }}
+            {% else %}
+              {{ edit.zipcode(size=5, class="form-input") }}
+            {% endif %}
           </div>
-          {%  for error in edit.zipcode.errors %}
-          <span style="color: red;">{{ error }}</span>
-      {% endfor %}
-        <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;">
-        {{ edit.submit(class="sign-up button submit") }}
+          {% for error in edit.zipcode.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
+        <hr class="hr">
+        {{ edit.editSubmit(class="sign-up button submit") }}
       </form>
     </div>
-    <div id="delete-profile" style="display: none;">
-      <form class="delete-form">
+    <div id="delete-profile" style="display: none; flex-direction: column;">
+      <form class="delete-form" method="POST" action="/profile/delete">
           {{ delete.csrf_token }}
           {{ delete.password.label(class='form-label') }}
           <div class="form-field">
-            {{ delete.password(class='form-input') }}
+            {% if delete.password.errors %}
+              {{ delete.password(class='input-error') }}
+            {% else %}
+              {{ delete.password(class='form-input') }}
+            {% endif %}
           </div>
-      </form>
-      <hr style="border: 1px solid #D9D9D9; margin: 1rem 0 1rem 0;">
-      {{ delete.submit(class='sign-up button delete-submit')}}
+          {% for error in delete.password.errors %}
+            <p class="error">{{ error }}</p>
+          {% endfor %}
+      <hr class="hr">
+      {{ delete.deleteSubmit(class='sign-up button delete-submit')}}
       <p class="delete-warning">Once deleted, there is no way to restore your information! All of your information will be removed from our system.</p>
+      </form>
     </div>
   </section>
 </body>
+<script>
+  editForm = document.getElementById('edit-profile');
+  deleteForm = document.getElementById('delete-profile');
 
+  editButton = document.getElementById('edit-profile-link');
+  deleteButton = document.getElementById('delete-profile-link');
+
+  function switchForm(link){
+    if(link === 'delete-profile-link' && deleteForm.style.display == 'none'){
+      editForm.style.display = 'none';
+      deleteForm.style.display = 'flex';
+
+      editButton.classList.remove('profile-nav-item-active');
+      deleteButton.classList.add('profile-nav-item-active');
+    }
+    else if(link === 'edit-profile-link' && editForm.style.display == 'none'){
+      deleteForm.style.display = 'none';
+      editForm.style.display = 'flex';
+
+      deleteButton.classList.remove('profile-nav-item-active');
+      editButton.classList.add('profile-nav-item-active');
+    }
+  }
+
+  editButton.addEventListener('click', switchForm);
+  deleteButton.addEventListener('click', switchForm);
+
+</script>
 </html>

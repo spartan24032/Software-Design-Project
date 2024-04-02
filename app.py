@@ -14,11 +14,57 @@ from PricingModel import Calculation
 
 app = create_app()
 
-users = {}
+# Since we don't have a database yet, we're temporarily storing users in a list
+users = []
+
+class User:
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+        self.name = ""
+        self.address1 = ""
+        self.address2 = ""
+        self.city = ""
+        self.state = ""
+        self.zipcode = ""
+    
+    def get_username(self):
+        return self.username
+    
+    def get_password(self):
+        return self.password
+    
+def edit_user(name, address1, address2, city, state, zipcode):
+    session_user = session.get('username')
+    if session_user:
+        for user in users:
+            if session_user == user.get_username():
+                user.name = name
+                user.address1 = address1
+                user.address2 = address2
+                user.city = city
+                user.state = state
+                user.zipcode = zipcode
+                return True
+    else:
+        return False
+
+def delete_user():
+    index = 0
+    session_user = session.get('username')
+    if session_user:
+        for user in users:
+            if session_user == user.get_username():
+                del users[index]
+                return True
+            index += 1
+    return False
+
 fuel_quotes = [
         {'clientName': 'Sahib Singh', 'clientAddress': '321 bigandtall, Houston, TX', 'gallonsRequested': 5, 'deliveryDate': '2024-01-01', 'pricePerGallon': '3.00', 'totalAmountDue': '$15.00'},
         {'clientName': 'John Doe', 'clientAddress': '123 Elm St, New York, NY', 'gallonsRequested': 10, 'deliveryDate': '2024-01-15', 'pricePerGallon': '2.75', 'totalAmountDue': '$27.50'}
     ]
+
 def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
     new_quote = {
         'clientName': client_name,
@@ -65,9 +111,7 @@ def confirm_quote():
 # profile --> sebastian
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    edit = EditProfile() # under the hood, request.form is passed as an argument
-    delete = DeleteProfile()
-    return render_template('profile.html', edit=edit, delete=delete)
+    return render_template('profile.html', edit=EditProfile(), delete=DeleteProfile())
 
 @app.route('/profile/edit', methods=['POST'])
 def edit_profile():
@@ -80,8 +124,11 @@ def edit_profile():
         state = edit.state.data
         zipcode = edit.zipcode.data
         # No database implementation yet
-        print(name, address1, address2, city, state, zipcode)
-        return redirect('/profile')
+        if edit_user(name, address1, address2, city, state, zipcode):
+            return redirect('/profile')
+        else: 
+            # TODO: add new route for unsuccessful edit
+            return redirect('/profile')
     else:
         return render_template('profile.html', edit=edit, delete=DeleteProfile())
 
@@ -90,10 +137,12 @@ def edit_profile():
 def delete_profile():
     delete = DeleteProfile()
     if delete.validate_on_submit(): 
-        password = delete.password.data
         # No database implementation yet
-        print(password)
-        return redirect('/signup')
+        if delete_user():
+            return redirect('/signup')
+        else: 
+            # TODO: add new route for unsuccessful deletion
+            return redirect('/signup')
     else:
         return render_template('profile.html', edit=EditProfile(), delete=delete)
 # @app.route('/signup', methods=['POST','GET'])
@@ -112,7 +161,8 @@ def sign_up():
     if formS.validate_on_submit():
         username = formS.username.data
         password = formS.password.data
-        users[username] = password
+        user = User(username, password)
+        users.append(user)
         return render_template('login.html', form=LoginForm())
     else:
         return render_template('signup.html', form=formS)
@@ -124,13 +174,19 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
-
+        for user in users:
+            if username == user.get_username() and password == user.get_password():
+                session["username"] = username
+                return render_template ('profile.html', edit=EditProfile(), delete=DeleteProfile())
+        return '<h1>invalid credentials!</h1>'
+        """
         if username in users and users[username] == password:
             edit = EditProfile()
             delete = DeleteProfile()
             return render_template ('profile.html', edit=edit, delete=delete)
         else:
             return '<h1>invalid credentials!</h1>'
+        """
     else:
         return render_template('login.html',form=form)
 

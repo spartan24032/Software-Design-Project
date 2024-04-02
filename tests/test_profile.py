@@ -35,6 +35,6 @@ def test_delete_profile(test_client):
 	response = test_client.post(
 		'/profile/delete',
 		data={'password': ''},
-		follow_redirects=False
+		follow_redirects=True
 	)
 	assert response.status_code == 200

@@ -7,7 +7,6 @@ from app import app
 
 @pytest.fixture()
 def test_client():
-	
 	# Configure app for testing
     app.config.from_object('config.TestingConfig')
 

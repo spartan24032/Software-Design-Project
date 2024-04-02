@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, session
 
 project_dir = os.path.dirname(__file__)
 

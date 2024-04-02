@@ -177,7 +177,7 @@ def login():
         for user in users:
             if username == user.get_username() and password == user.get_password():
                 session["username"] = username
-                return render_template ('profile.html', edit=EditProfile(), delete=DeleteProfile())
+                return redirect('/profile')
         return '<h1>invalid credentials!</h1>'
         """
         if username in users and users[username] == password:

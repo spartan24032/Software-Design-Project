@@ -6,23 +6,22 @@ def test_create_user(test_client):
 	password = "test_pass"
 
 	user = User(username, password)
-	assert user.get_username() != ""
+	assert user.get_username() != "" and user.get_password() != ""
 
 def test_edit_user(test_client):
 	username = "test_user"
 	password = "test_pass"
 
-	# sign up and log in to set session cookie
 	response_signup = test_client.post(
 		'/signup',
-		data={'username': username, 'password': password},
+		data={'username': username, 'password': password, 'confirm_password': password},
 		follow_redirects=True
 	)
 	assert response_signup.status_code == 200
 
 	response_login = test_client.post(
 		'/login',
-		data={'username': username, 'password': password, 'confirm_password': password},
+		data={'username': username, 'password': password},
 		follow_redirects=True
 	)
 	assert response_login.status_code == 200
@@ -46,7 +45,9 @@ def test_edit_user(test_client):
 	assert response_edit.request.path == "/profile"
 
 	# test unsuccessful edit
-	session["username"] = ""
+	with test_client.session_transaction() as session:
+		session["username"] = ""
+
 	response_edit = test_client.post(
 		'/profile/edit',
 		data={'name': name, 'address1': address1, 'address2': address2, 'city': city, 'state': state, 'zipcode': zipcode},
@@ -56,20 +57,20 @@ def test_edit_user(test_client):
 	assert response_edit.request.path == "/profile"
 
 def test_delete_user(test_client):
-	username = "test_user"
-	password = "test_pass"
+	username = "test_user2"
+	password = "test_pass2"
 
 	# sign up and log in to set session cookie
 	response_signup = test_client.post(
 		'/signup',
-		data={'username': username, 'password': password},
+		data={'username': username, 'password': password, 'confirm_password': password},
 		follow_redirects=True
 	)
 	assert response_signup.status_code == 200
 
 	response_login = test_client.post(
 		'/login',
-		data={'username': username, 'password': password, 'confirm_password': password},
+		data={'username': username, 'password': password},
 		follow_redirects=True
 	)
 	assert response_login.status_code == 200
@@ -84,7 +85,9 @@ def test_delete_user(test_client):
 	assert response_delete.request.path == "/signup"
 
 	# test unsuccessful deletion
-	session["username"] = ""
+	with test_client.session_transaction() as session:
+		session["username"] = ""
+
 	user = User(username, password)
 	users.append(user)
 	response_delete = test_client.post(

@@ -1,5 +1,6 @@
 import pytest
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
+from flask import url_for
     
 def test_profile_get(test_client):
 	response = test_client.get('/profile')
@@ -30,3 +31,10 @@ def test_delete_profile(test_client):
 	assert len(response.history) == 1
 	# Check that the redirect request was for the profile page.
 	assert response.request.path == "/signup"
+	# test with invalid form data
+	response = test_client.post(
+		'/profile/delete',
+		data={'password': ''},
+		follow_redirects=False
+	)
+	assert response.status_code == 200

@@ -10,11 +10,28 @@ from flask_app.forms.login_signup import LoginForm, SignupForm
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
 from flask_app.forms.order_form import QuoteForm
 
+#Imports for the Database 
+from flask_mysqldb import MySQL
+from dotenv import load_dotenv
+
 from PricingModel import Calculation
 
 app = create_app()
 
+
+# Configure MySQL
+app.config['MYSQL_HOST'] = "34.174.69.237" 
+app.config['MYSQL_USER'] = "root"
+app.config['MYSQL_PASSWORD'] = "Enterhere#1#" 
+app.config['MYSQL_DB'] = "Singh_Schema"
+app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Return rows as dictionaries
+
+# Initialize MySQL
+mysql = MySQL(app)
+
 # Since we don't have a database yet, we're temporarily storing users in a list
+
+
 users = []
 
 class User:
@@ -80,6 +97,13 @@ def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, 
 @app.route('/') 
 def homepage():
     #print(current_dir)
+     # Example route to test the database connection
+    cur = mysql.connection.cursor()
+    cur.execute('SELECT 1')
+    data = cur.fetchone()
+    cur.close()
+    return f'Database connection test: {data["1"]}'
+
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #Landing Page for the Order Form 
@@ -145,15 +169,7 @@ def delete_profile():
             return redirect('/signup')
     else:
         return render_template('profile.html', edit=EditProfile(), delete=delete)
-# @app.route('/signup', methods=['POST','GET'])
-# def sign_up():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         users[username] = password
-#         return render_template('login.html')
-#     elif request.method == 'GET':
-#         return render_template('signup.html')
+
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
     formS = SignupForm() 
@@ -179,14 +195,6 @@ def login():
                 session["username"] = username
                 return redirect('/profile')
         return '<h1>invalid credentials!</h1>'
-        """
-        if username in users and users[username] == password:
-            edit = EditProfile()
-            delete = DeleteProfile()
-            return render_template ('profile.html', edit=edit, delete=delete)
-        else:
-            return '<h1>invalid credentials!</h1>'
-        """
     else:
         return render_template('login.html',form=form)
 

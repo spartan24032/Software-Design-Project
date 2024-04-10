@@ -3,6 +3,7 @@
 .env
 __pycache__
 .coverage
+vanguard.env
 .vscode
 venv
 # linter

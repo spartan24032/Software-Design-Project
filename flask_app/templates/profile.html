@@ -282,8 +282,8 @@
       </ul>
     </nav>
     <div class="nav-buttons" style="margin-right: 1rem;">
-      <button class="sign-up button">
-        <a href="/" style="text-decoration: none; cursor: pointer; color: white">Sign Out</a>
+      <button id= "clear_session" class="sign-up button">
+        <a   style="text-decoration: none; cursor: pointer; color: white">Sign Out </a>
       </button>
     </div>
   </header>
@@ -388,6 +388,7 @@
     </div>
   </section>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   editForm = document.getElementById('edit-profile');
   deleteForm = document.getElementById('delete-profile');
@@ -415,5 +416,23 @@
   editButton.addEventListener('click', switchForm);
   deleteButton.addEventListener('click', switchForm);
 
+
+  $(document).ready(function(){
+    $("#clear_session").click(function(){
+      $.ajax({
+            url: '/clear_session',
+            method: 'GET', 
+            success: function(response) {
+                alert('Logged Out!');
+                window.location.href = "/";
+                
+                console.log('Container content sent successfully');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error sending container content: ' + error);
+            }
+        });
+    });
+});
 </script>
 </html>

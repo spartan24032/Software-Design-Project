@@ -11,26 +11,29 @@ from flask_app.forms.profile_form import EditProfile, DeleteProfile
 from flask_app.forms.order_form import QuoteForm
 
 #Imports for the Database 
-from flask_mysqldb import MySQL
-from dotenv import load_dotenv
+import pymysql
 
 from PricingModel import Calculation
 
 app = create_app()
 
 
-# Configure MySQL
-app.config['MYSQL_HOST'] = "34.174.69.237" 
-app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "Enterhere#1#" 
-app.config['MYSQL_DB'] = "Singh_Schema"
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Return rows as dictionaries
+f = None
+try:
+    f = open('vanguard.env', 'r')
+except:
+    print("vanguard.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
+    exit(1)
 
-# Initialize MySQL
-mysql = MySQL(app)
+env_lines = f.read().splitlines()
 
-# Since we don't have a database yet, we're temporarily storing users in a list
-
+def get_conn():
+    return pymysql.connect(
+        host=env_lines[0].strip(),
+        user=env_lines[1].strip(),
+        password=env_lines[2].strip(),
+        database=env_lines[3].strip()
+    )
 
 users = []
 
@@ -93,22 +96,19 @@ def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, 
     }
     fuel_quotes.append(new_quote)
 
+def non_valid_point():
+    if ("username" not in session):
+        return True
+
 #Routing Functions 
 @app.route('/') 
 def homepage():
-    #print(current_dir)
-     # Example route to test the database connection
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT 1')
-    data = cur.fetchone()
-    cur.close()
-    return f'Database connection test: {data["1"]}'
-
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #Landing Page for the Order Form 
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
+    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
     formQ = QuoteForm()
     if request.method =="GET":
          return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
@@ -118,8 +118,11 @@ def fuel_quote_form():
         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
     else:
         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+
+
 @app.route('/finalize_value',methods=['POST'])
 def confirm_quote():
+    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
     if request.method == "POST":
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
@@ -132,10 +135,12 @@ def confirm_quote():
     return 'Success',200
 
 
-# profile --> sebastian
+
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
+    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
     return render_template('profile.html', edit=EditProfile(), delete=DeleteProfile())
+
 
 @app.route('/profile/edit', methods=['POST'])
 def edit_profile():
@@ -156,7 +161,8 @@ def edit_profile():
     else:
         return render_template('profile.html', edit=edit, delete=DeleteProfile())
 
-# profile --> sebastian
+
+
 @app.route('/profile/delete', methods=['POST'])
 def delete_profile():
     delete = DeleteProfile()
@@ -179,6 +185,7 @@ def sign_up():
         password = formS.password.data
         user = User(username, password)
         users.append(user)
+        session['username'] = True
         return render_template('login.html', form=LoginForm())
     else:
         return render_template('signup.html', form=formS)
@@ -197,6 +204,12 @@ def login():
         return '<h1>invalid credentials!</h1>'
     else:
         return render_template('login.html',form=form)
+   
+@app.route('/clear_session')
+def clear_out():
+    del session['username']
+    return 'Success',200
+
 
 @app.route('/styles.css')
 def style_css():

@@ -1,5 +1,6 @@
 # Flask/Python files
 .pytest_cache
+SQL_INFO.env
 .env
 __pycache__
 .coverage

@@ -290,11 +290,40 @@
   <section id="profile-management">
     <navbar class="profile-nav">
       <ul class="profile-nav-list">
-        <li class="profile-nav-item profile-nav-item-active" id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
+        <li class="profile-nav-item profile-nav-item-active" id='view-profile-link'  onclick="switchForm('view-profile-link')">View Profile</li>
+        <li class="profile-nav-item " id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
         <li class="profile-nav-item" id="delete-profile-link"  onclick="switchForm('delete-profile-link')">Delete Profile</li>
       </ul>
     </navbar>
-    <div id="edit-profile" style="display: flex; flex-direction: column;">
+    <!-- profile_view.html -->
+<div id="view-profile" style="display: flex; flex-direction: column;">
+      <label class="form-label">Name</label>
+      <div class="form-field">
+          <p>{{ profile_data.name }}</p>
+      </div>
+      <label class="form-label">Address 1</label>
+      <div class="form-field">
+          <p>{{ profile_data.address1 }}</p>
+      </div>
+      <label class="form-label">Address 2</label>
+      <div class="form-field">
+          <p>{{ profile_data.address2 }}</p>
+      </div>
+      <label class="form-label">State</label>
+      <div class="form-field">
+          <p>{{ profile_data.state }}</p>
+      </div>
+      <label class="form-label">City</label>
+      <div class="form-field">
+          <p>{{ profile_data.city }}</p>
+      </div>
+      <label class="form-label">Zipcode</label>
+      <div class="form-field">
+          <p>{{ profile_data.zipcode }}</p>
+      </div>
+</div>
+
+    <div id="edit-profile" style="display: none; flex-direction: column;">
       <form class="edit-form" method="POST" action="/profile/edit">
           {{ edit.csrf_token }}
           {{ edit.name.label(class='form-label') }}
@@ -392,29 +421,50 @@
 <script>
   editForm = document.getElementById('edit-profile');
   deleteForm = document.getElementById('delete-profile');
+  viewProfile = document.getElementById('view-profile');
 
   editButton = document.getElementById('edit-profile-link');
   deleteButton = document.getElementById('delete-profile-link');
+  viewButton = document.getElementById('view-profile-link');
 
   function switchForm(link){
     if(link === 'delete-profile-link' && deleteForm.style.display == 'none'){
       editForm.style.display = 'none';
+      viewProfile.style.display ='none';
       deleteForm.style.display = 'flex';
 
       editButton.classList.remove('profile-nav-item-active');
+      viewButton.classList.remove('profile-nav-item-active');
+
       deleteButton.classList.add('profile-nav-item-active');
     }
     else if(link === 'edit-profile-link' && editForm.style.display == 'none'){
       deleteForm.style.display = 'none';
+      viewProfile.style.display ='none';
       editForm.style.display = 'flex';
 
+      viewButton.classList.remove('profile-nav-item-active');
       deleteButton.classList.remove('profile-nav-item-active');
+
       editButton.classList.add('profile-nav-item-active');
     }
+    else if(link === 'view-profile-link' && viewProfile.style.display == 'none'){
+      deleteForm.style.display = 'none';
+      editForm.style.display = 'none';
+
+      viewProfile.style.display ='flex';
+
+      editButton.classList.remove('profile-nav-item-active');
+      deleteButton.classList.remove('profile-nav-item-active');
+
+      viewButton.classList.add('profile-nav-item-active');
+
   }
+}
 
   editButton.addEventListener('click', switchForm);
   deleteButton.addEventListener('click', switchForm);
+  viewButton.addEventListener('click',switchForm)
 
 
   $(document).ready(function(){

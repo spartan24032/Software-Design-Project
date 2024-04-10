@@ -18,12 +18,12 @@ from PricingModel import Calculation
 
 app = create_app()
 
-
+#
 f = None
 try:
-    f = open('vanguard.env', 'r')
+    f = open('SQL_INFO.env', 'r')
 except:
-    print("vanguard.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
+    print("SQL_INFO.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
     exit(1)
 
 env_lines = f.read().splitlines()
@@ -35,8 +35,8 @@ def get_conn():
         password=env_lines[2].strip(),
         database=env_lines[3].strip()
     )
-def hash_password(password):
-    return hashlib.sha256(password.encode('utf-8')).digest()    
+#Hash Passwords Into the Database
+def hash_password(password): return hashlib.sha256(password.encode('utf-8')).digest()    
 
 def check_login(username,password):
     query = 'Select encrypted_password From UserCredentials WHERE username =%s'
@@ -81,20 +81,18 @@ class User:
 
 def edit_user(name, address1, address2, city, state, zipcode):
     session_user = session.get('username')
-    if session_user:
-        for user in users:
-            if session_user == user.get_username():
-                user.name = name
-                user.address1 = address1
-                user.address2 = address2
-                user.city = city
-                user.state = state
-                user.zipcode = zipcode
-                return True
-    else:
-        return False
+
+
+    return False
 
 def delete_user():
+    with get_conn() as conn, conn.cursor() as cursor:
+            query = 'DELETE FROM UserCredentials WHERE username = %s'
+            vals =(session['username'])
+            cursor.execute(query,vals)
+            conn.commit()
+    del session['username']
+    return True
     index = 0
     session_user = session.get('username')
     if session_user:
@@ -121,6 +119,14 @@ def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, 
     }
     fuel_quotes.append(new_quote)
 
+profile_data = {
+    'name': 'John Doe',
+    'address1': '123 Main St',
+    'address2': 'Apt 101',
+    'city': 'Anytown',
+    'state': 'NY',
+    'zipcode': '12345'
+}
 def non_valid_point():
     if ("username" not in session):
         return True
@@ -164,7 +170,7 @@ def confirm_quote():
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
     if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
-    return render_template('profile.html', edit=EditProfile(), delete=DeleteProfile())
+    return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
 
 
 @app.route('/profile/edit', methods=['POST'])
@@ -194,9 +200,9 @@ def delete_profile():
     if delete.validate_on_submit(): 
         # No database implementation yet
         if delete_user():
-            return redirect('/signup')
+            return redirect('/') #send them back home upon deletion
         else: # TODO: add new route for unsuccessful deletion
-            return redirect('/signup')
+            return redirect('/')
     else:
         return render_template('profile.html', edit=EditProfile(), delete=delete)
 

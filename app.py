@@ -6,6 +6,7 @@ from flask_app import create_app
 import os
 import random
 import config
+import hashlib
 from flask_app.forms.login_signup import LoginForm, SignupForm
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
 from flask_app.forms.order_form import QuoteForm
@@ -34,6 +35,19 @@ def get_conn():
         password=env_lines[2].strip(),
         database=env_lines[3].strip()
     )
+def hash_password(password):
+    return hashlib.sha256(password.encode('utf-8')).digest()    
+
+def check_login(username,password):
+    query = 'Select encrypted_password From UserCredentials WHERE username =%s'
+    vals = username
+    #print(hash_password(password))
+    with get_conn() as conn, conn.cursor() as cursor:
+        cursor.execute(query, vals)
+        result = cursor.fetchone()
+        conn.commit()
+        if result is None: return False
+        return(hash_password(password)==result[0])
 
 users = []
 
@@ -53,7 +67,18 @@ class User:
     
     def get_password(self):
         return self.password
-    
+    def add_profile(self):
+        with get_conn() as conn, conn.cursor() as cursor:
+            query = 'INSERT INTO UserCredentials (username, encrypted_password)VALUES (%s,%s)'
+            vals =(self.username,hash_password(self.password))
+            cursor.execute(query,vals)
+            conn.commit()
+         
+
+
+
+
+
 def edit_user(name, address1, address2, city, state, zipcode):
     session_user = session.get('username')
     if session_user:
@@ -170,8 +195,7 @@ def delete_profile():
         # No database implementation yet
         if delete_user():
             return redirect('/signup')
-        else: 
-            # TODO: add new route for unsuccessful deletion
+        else: # TODO: add new route for unsuccessful deletion
             return redirect('/signup')
     else:
         return render_template('profile.html', edit=EditProfile(), delete=delete)
@@ -184,8 +208,8 @@ def sign_up():
         username = formS.username.data
         password = formS.password.data
         user = User(username, password)
-        users.append(user)
-        session['username'] = True
+        user.add_profile()
+        #users.append(user)
         return render_template('login.html', form=LoginForm())
     else:
         return render_template('signup.html', form=formS)
@@ -197,11 +221,14 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
-        for user in users:
-            if username == user.get_username() and password == user.get_password():
-                session["username"] = username
-                return redirect('/profile')
-        return '<h1>invalid credentials!</h1>'
+        # for user in users:
+        #     if username == user.get_username() and password == user.get_password():
+        #         session["username"] = username
+        #         return redirect('/profile')
+        if(check_login(username,password)):
+            session["username"] = username
+            return redirect('/profile')
+        return '<h1>No Profile Exist</h1>'
     else:
         return render_template('login.html',form=form)
    

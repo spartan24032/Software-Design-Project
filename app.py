@@ -20,18 +20,16 @@ app = create_app()
 
 
 # Configure MySQL
-app.config['MYSQL_HOST'] = "34.174.69.237" 
-app.config['MYSQL_USER'] = "root"
-app.config['MYSQL_PASSWORD'] = "Enterhere#1#" 
-app.config['MYSQL_DB'] = "Singh_Schema"
-app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Return rows as dictionaries
+app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
+app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
+app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
+app.config['MYSQL_CURSORCLASS'] = os.environ.get('MYSQL_CURSORCLASS')  # return rows as dictionaries
 
 # Initialize MySQL
 mysql = MySQL(app)
 
 # Since we don't have a database yet, we're temporarily storing users in a list
-
-
 users = []
 
 class User:

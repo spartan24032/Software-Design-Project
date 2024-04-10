@@ -5,6 +5,8 @@ __pycache__
 .coverage
 .vscode
 venv
+
+htmlcov
 # linter
 nohup.out
 bob.py

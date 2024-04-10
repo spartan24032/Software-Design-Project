@@ -139,7 +139,7 @@ def homepage():
 #Landing Page for the Order Form 
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
-    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
+    if(non_valid_point()): return redirect('/')
     formQ = QuoteForm()
     if request.method =="GET":
          return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
@@ -153,7 +153,7 @@ def fuel_quote_form():
 
 @app.route('/finalize_value',methods=['POST'])
 def confirm_quote():
-    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
+    if(non_valid_point()): return redirect('/')
     if request.method == "POST":
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
@@ -169,7 +169,7 @@ def confirm_quote():
 
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
+    if (non_valid_point()): return redirect('/')
     return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
 
 
@@ -234,7 +234,7 @@ def login():
         if(check_login(username,password)):
             session["username"] = username
             return redirect('/profile')
-        return '<h1>No Profile Exist</h1>'
+        return render_template('error_message.html',error_message ="This account may not exist. Verify login.",image_filename=r'/img/broken.jpg')
     else:
         return render_template('login.html',form=form)
    

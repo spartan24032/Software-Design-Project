@@ -6,30 +6,49 @@ from flask_app import create_app
 import os
 import random
 import config
+import hashlib
 from flask_app.forms.login_signup import LoginForm, SignupForm
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
 from flask_app.forms.order_form import QuoteForm
 
 #Imports for the Database 
-from flask_mysqldb import MySQL
-from dotenv import load_dotenv
+import pymysql
 
 from PricingModel import Calculation
 
 app = create_app()
 
+#
+f = None
+try:
+    f = open('SQL_INFO.env', 'r')
+except:
+    print("SQL_INFO.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
+    exit(1)
 
-# Configure MySQL
-app.config['MYSQL_HOST'] = os.environ.get('MYSQL_HOST')
-app.config['MYSQL_USER'] = os.environ.get('MYSQL_USER')
-app.config['MYSQL_PASSWORD'] = os.environ.get('MYSQL_PASSWORD')
-app.config['MYSQL_DB'] = os.environ.get('MYSQL_DB')
-app.config['MYSQL_CURSORCLASS'] = os.environ.get('MYSQL_CURSORCLASS')  # return rows as dictionaries
+env_lines = f.read().splitlines()
 
-# Initialize MySQL
-mysql = MySQL(app)
+def get_conn():
+    return pymysql.connect(
+        host=env_lines[0].strip(),
+        user=env_lines[1].strip(),
+        password=env_lines[2].strip(),
+        database=env_lines[3].strip()
+    )
+#Hash Passwords Into the Database
+def hash_password(password): return hashlib.sha256(password.encode('utf-8')).digest()    
 
-# Since we don't have a database yet, we're temporarily storing users in a list
+def check_login(username,password):
+    query = 'Select encrypted_password From UserCredentials WHERE username =%s'
+    vals = username
+    #print(hash_password(password))
+    with get_conn() as conn, conn.cursor() as cursor:
+        cursor.execute(query, vals)
+        result = cursor.fetchone()
+        conn.commit()
+        if result is None: return False
+        return(hash_password(password)==result[0])
+
 users = []
 
 class User:
@@ -48,23 +67,32 @@ class User:
     
     def get_password(self):
         return self.password
-    
+    def add_profile(self):
+        with get_conn() as conn, conn.cursor() as cursor:
+            query = 'INSERT INTO UserCredentials (username, encrypted_password)VALUES (%s,%s)'
+            vals =(self.username,hash_password(self.password))
+            cursor.execute(query,vals)
+            conn.commit()
+         
+
+
+
+
+
 def edit_user(name, address1, address2, city, state, zipcode):
     session_user = session.get('username')
-    if session_user:
-        for user in users:
-            if session_user == user.get_username():
-                user.name = name
-                user.address1 = address1
-                user.address2 = address2
-                user.city = city
-                user.state = state
-                user.zipcode = zipcode
-                return True
-    else:
-        return False
+
+
+    return False
 
 def delete_user():
+    with get_conn() as conn, conn.cursor() as cursor:
+            query = 'DELETE FROM UserCredentials WHERE username = %s'
+            vals =(session['username'])
+            cursor.execute(query,vals)
+            conn.commit()
+    del session['username']
+    return True
     index = 0
     session_user = session.get('username')
     if session_user:
@@ -91,22 +119,27 @@ def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, 
     }
     fuel_quotes.append(new_quote)
 
+profile_data = {
+    'name': 'John Doe',
+    'address1': '123 Main St',
+    'address2': 'Apt 101',
+    'city': 'Anytown',
+    'state': 'NY',
+    'zipcode': '12345'
+}
+def non_valid_point():
+    if ("username" not in session):
+        return True
+
 #Routing Functions 
 @app.route('/') 
 def homepage():
-    #print(current_dir)
-     # Example route to test the database connection
-    cur = mysql.connection.cursor()
-    cur.execute('SELECT 1')
-    data = cur.fetchone()
-    cur.close()
-    return f'Database connection test: {data["1"]}'
-
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #Landing Page for the Order Form 
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
+    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
     formQ = QuoteForm()
     if request.method =="GET":
          return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
@@ -116,8 +149,11 @@ def fuel_quote_form():
         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
     else:
         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+
+
 @app.route('/finalize_value',methods=['POST'])
 def confirm_quote():
+    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
     if request.method == "POST":
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
@@ -130,10 +166,12 @@ def confirm_quote():
     return 'Success',200
 
 
-# profile --> sebastian
+
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    return render_template('profile.html', edit=EditProfile(), delete=DeleteProfile())
+    if(non_valid_point()): return render_template('index.html',image_filename=r'/img/swif.jpg')
+    return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
+
 
 @app.route('/profile/edit', methods=['POST'])
 def edit_profile():
@@ -154,17 +192,17 @@ def edit_profile():
     else:
         return render_template('profile.html', edit=edit, delete=DeleteProfile())
 
-# profile --> sebastian
+
+
 @app.route('/profile/delete', methods=['POST'])
 def delete_profile():
     delete = DeleteProfile()
     if delete.validate_on_submit(): 
         # No database implementation yet
         if delete_user():
-            return redirect('/signup')
-        else: 
-            # TODO: add new route for unsuccessful deletion
-            return redirect('/signup')
+            return redirect('/') #send them back home upon deletion
+        else: # TODO: add new route for unsuccessful deletion
+            return redirect('/')
     else:
         return render_template('profile.html', edit=EditProfile(), delete=delete)
 
@@ -176,7 +214,8 @@ def sign_up():
         username = formS.username.data
         password = formS.password.data
         user = User(username, password)
-        users.append(user)
+        user.add_profile()
+        #users.append(user)
         return render_template('login.html', form=LoginForm())
     else:
         return render_template('signup.html', form=formS)
@@ -188,13 +227,22 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
-        for user in users:
-            if username == user.get_username() and password == user.get_password():
-                session["username"] = username
-                return redirect('/profile')
-        return '<h1>invalid credentials!</h1>'
+        # for user in users:
+        #     if username == user.get_username() and password == user.get_password():
+        #         session["username"] = username
+        #         return redirect('/profile')
+        if(check_login(username,password)):
+            session["username"] = username
+            return redirect('/profile')
+        return '<h1>No Profile Exist</h1>'
     else:
         return render_template('login.html',form=form)
+   
+@app.route('/clear_session')
+def clear_out():
+    del session['username']
+    return 'Success',200
+
 
 @app.route('/styles.css')
 def style_css():

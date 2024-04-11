@@ -49,6 +49,21 @@ def check_login(username,password):
         if result is None: return False
         return(hash_password(password)==result[0])
 
+def get_userID():
+    get_user_id  = 'Select ID FROM UserCredentials WHERE username = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            #First Find the ID
+            vals =(session['username'])
+            cursor.execute(get_user_id,vals)
+            get_user_id= cursor.fetchone()[0]
+    return get_user_id
+def get_clientID():
+    get_client_id  = 'Select client_id FROM UserCredentials WHERE user_credentials_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(get_client_id,get_userID())
+            get_client_id = cursor.fetchone()[0]
+    return get_client_id 
+
 users = []
 
 class User:
@@ -80,10 +95,13 @@ class User:
 
 
 def edit_user(name, address1, address2, city, state, zipcode):
-    session_user = session.get('username')
+    with get_conn() as conn, conn.cursor() as cursor:
+        query = "INSERT INTO ClientInformation (name, address1, address2, city, state, zipcode,user_credentials_id)VALUES (%s,%s,%s,%s,%s,%s,%s) "
+        vals = (name,address1,address2,city,state,zipcode,get_userID())
+        cursor.execute(query,vals)
+        conn.commit()
 
 
-    return False
 
 def delete_user():
     with get_conn() as conn, conn.cursor() as cursor:
@@ -119,14 +137,22 @@ def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, 
     }
     fuel_quotes.append(new_quote)
 
-profile_data = {
-    'name': 'John Doe',
-    'address1': '123 Main St',
-    'address2': 'Apt 101',
-    'city': 'Anytown',
-    'state': 'NY',
-    'zipcode': '12345'
-}
+def get_profile_data():
+    place_holder_start = {'name': '','address1': '','address2': '','city': '','state': '','zipcode': ''}
+
+    get_client_info = 'Select name, address1, address2,city,state, zipcode FROM ClientInformation WHERE user_credentials_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            #Use this when you need to send data back as a Dictionary instead of a tuple
+            cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+
+            cursor.execute(get_client_info,get_userID())
+            get_client_info = cursor.fetchone()
+            conn.commit()
+            
+    if(get_client_info ==None):
+        return place_holder_start
+
+    return get_client_info
 def non_valid_point():
     if ("username" not in session):
         return True
@@ -170,6 +196,7 @@ def confirm_quote():
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
     if (non_valid_point()): return redirect('/')
+    profile_data=get_profile_data()
     return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
 
 
@@ -184,11 +211,8 @@ def edit_profile():
         state = edit.state.data
         zipcode = edit.zipcode.data
         # No database implementation yet
-        if edit_user(name, address1, address2, city, state, zipcode):
-            return redirect('/profile')
-        else: 
-            # TODO: add new route for unsuccessful edit
-            return redirect('/profile')
+        edit_user(name, address1, address2, city, state, zipcode)
+        return redirect('/profile')
     else:
         return render_template('profile.html', edit=edit, delete=DeleteProfile())
 

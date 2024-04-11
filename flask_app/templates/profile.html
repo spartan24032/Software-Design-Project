@@ -268,6 +268,42 @@
     border: 1px solid #D9D9D9;
     margin: 1rem 0 1rem 0;
   }
+  .profile-container {
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    width: 20rem;
+    border: 1px solid #d9d9d9;
+    border-radius: 0.5rem;
+    background-color: white;
+    margin: 2.5rem 0 2rem 4rem;
+}
+
+.profile-wrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+}
+
+.profile-label {
+    margin: 0.5rem 0 0 0;
+}
+
+.profile-field {
+    display: flex;
+    margin-top: 0.5rem;
+    width: 100%; /* Ensure same width as other container */
+}
+
+.profile-info {
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: 0.3rem;
+    width: 100%;
+    background-color: #f9fbff;
+    border: 1px solid #d9d9d9;
+}
+
+
+
 
 </style>
 
@@ -296,31 +332,33 @@
       </ul>
     </navbar>
     <!-- profile_view.html -->
-<div id="view-profile" style="display: flex; flex-direction: column;">
-      <label class="form-label">Name</label>
-      <div class="form-field">
-          <p>{{ profile_data.name }}</p>
-      </div>
-      <label class="form-label">Address 1</label>
-      <div class="form-field">
-          <p>{{ profile_data.address1 }}</p>
-      </div>
-      <label class="form-label">Address 2</label>
-      <div class="form-field">
-          <p>{{ profile_data.address2 }}</p>
-      </div>
-      <label class="form-label">State</label>
-      <div class="form-field">
-          <p>{{ profile_data.state }}</p>
-      </div>
-      <label class="form-label">City</label>
-      <div class="form-field">
-          <p>{{ profile_data.city }}</p>
-      </div>
-      <label class="form-label">Zipcode</label>
-      <div class="form-field">
-          <p>{{ profile_data.zipcode }}</p>
-      </div>
+<div id="view-profile" style="display: flex; flex-direction: column;" class="profile-container">
+  <div class="profile-wrapper">
+    <label class="profile-label">Name</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.name }}</p>
+    </div>
+    <label class="profile-label">Address 1</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.address1 }}</p>
+    </div>
+    <label class="profile-label">Address 2</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.address2 }}</p>
+    </div>
+    <label class="profile-label">State</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.state }}</p>
+    </div>
+    <label class="profile-label">City</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.city }}</p>
+    </div>
+    <label class="profile-label">Zipcode</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.zipcode }}</p>
+    </div>
+</div>
 </div>
 
     <div id="edit-profile" style="display: none; flex-direction: column;">

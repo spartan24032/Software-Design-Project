@@ -56,17 +56,29 @@ def get_userID():
             vals =(session['username'])
             cursor.execute(get_user_id,vals)
             get_user_id= cursor.fetchone()[0]
+            conn.commit()
     return get_user_id
 def get_clientID():
     get_client_id  = 'Select client_id FROM ClientInformation WHERE user_credentials_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor.execute(get_client_id,get_userID())
             get_client_id = cursor.fetchone()
+            conn.commit()
+
     if(get_client_id is not None):
         return get_client_id[0] 
     return get_client_id
-# def has_history():
-#     get_history = 'Select 1 FROM FuelQuote WHERE clientID = %s'
+def has_history():
+    get_history = 'Select 1 FROM FuelQuote WHERE client_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(get_history,get_clientID())
+            get_history = cursor.fetchone()
+            conn.commit()
+    if(get_history is None):
+        return False
+    return True
+    
+
 
 users = []
 
@@ -125,21 +137,24 @@ def delete_user():
             index += 1
     return False
 
-fuel_quotes = [
-        {'clientName': 'Sahib Singh', 'clientAddress': '321 bigandtall, Houston, TX', 'gallonsRequested': 5, 'deliveryDate': '2024-01-01', 'pricePerGallon': '3.00', 'totalAmountDue': '$15.00'},
-        {'clientName': 'John Doe', 'clientAddress': '123 Elm St, New York, NY', 'gallonsRequested': 10, 'deliveryDate': '2024-01-15', 'pricePerGallon': '2.75', 'totalAmountDue': '$27.50'}
-    ]
 
-def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
-    new_quote = {
-        'clientName': client_name,
-        'clientAddress': client_address,
-        'gallonsRequested': gallons_requested,
-        'deliveryDate': delivery_date,
-        'pricePerGallon': price_per_gallon,
-        'totalAmountDue': total_amount_due
-    }
-    fuel_quotes.append(new_quote)
+def get_all_fuel_quotes_client():
+    get_history = 'Select * FROM FuelQuote WHERE client_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+            cursor.execute(get_history,get_clientID())
+            get_history = cursor.fetchall()
+            conn.commit()
+    print(get_history)
+    return get_history
+
+
+def add_fuel_quote( client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
+    insert_quote= 'INSERT INTO FuelQuote (client_id,gallons_requested, delivery_address,delivery_date,suggested_price_per_gallon,total_amount_due)VALUES (%s,%s,%s,%s,%s,%s)'
+    with get_conn() as conn, conn.cursor() as cursor:
+            vals =(get_clientID(),gallons_requested,client_address,delivery_date,price_per_gallon,total_amount_due)
+            cursor.execute(insert_quote,vals)
+            conn.commit()
 
 def get_profile_data():
     place_holder_start = {'name': '','address1': '','address2': '','city': '','state': '','zipcode': ''}
@@ -174,13 +189,14 @@ def fuel_quote_form():
         return render_template('error_message.html',error_message ="Please complete profile first.",image_filename=r'/img/broken.jpg')
     formQ = QuoteForm()
     if request.method =="GET":
-         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
     if formQ.validate_on_submit():
         gallons, address, date = formQ.gallons.data,formQ.deliveryAddress.data,formQ.deliveryDate.data
-        formQ.price.data  = Calculation.Price(gallons,'Texas',False)
-        return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+
+        formQ.price.data  = Calculation.Price(gallons,address,has_history())
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
     else:
-        return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
 
 
 @app.route('/finalize_value',methods=['POST'])
@@ -193,7 +209,7 @@ def confirm_quote():
         Gallons = data_incoming.get('gallons')
         Date = data_incoming.get('date')
         Address = data_incoming.get('address')
-        add_fuel_quote(fuel_quotes, 'New Name', Address, Gallons, Date, Suggested_Price, Total_Amount)
+        add_fuel_quote( Address, Gallons, Date, Suggested_Price, Total_Amount)
 
     return 'Success',200
 

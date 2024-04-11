@@ -6,15 +6,80 @@ from flask_app import create_app
 import os
 import random
 import config
+import hashlib
 from flask_app.forms.login_signup import LoginForm, SignupForm
 from flask_app.forms.profile_form import EditProfile, DeleteProfile
 from flask_app.forms.order_form import QuoteForm
+
+#Imports for the Database 
+import pymysql
 
 from PricingModel import Calculation
 
 app = create_app()
 
-# Since we don't have a database yet, we're temporarily storing users in a list
+#
+f = None
+try:
+    f = open('SQL_INFO.env', 'r')
+except:
+    print("SQL_INFO.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
+    exit(1)
+
+env_lines = f.read().splitlines()
+
+def get_conn():
+    return pymysql.connect(
+        host=env_lines[0].strip(),
+        user=env_lines[1].strip(),
+        password=env_lines[2].strip(),
+        database=env_lines[3].strip()
+    )
+#Hash Passwords Into the Database
+def hash_password(password): return hashlib.sha256(password.encode('utf-8')).digest()    
+
+def check_login(username,password):
+    query = 'Select encrypted_password From UserCredentials WHERE username =%s'
+    vals = username
+    #print(hash_password(password))
+    with get_conn() as conn, conn.cursor() as cursor:
+        cursor.execute(query, vals)
+        result = cursor.fetchone()
+        conn.commit()
+        if result is None: return False
+        return(hash_password(password)==result[0])
+
+def get_userID():
+    get_user_id  = 'Select ID FROM UserCredentials WHERE username = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            #First Find the ID
+            vals =(session['username'])
+            cursor.execute(get_user_id,vals)
+            get_user_id= cursor.fetchone()[0]
+            conn.commit()
+    return get_user_id
+def get_clientID():
+    get_client_id  = 'Select client_id FROM ClientInformation WHERE user_credentials_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(get_client_id,get_userID())
+            get_client_id = cursor.fetchone()
+            conn.commit()
+
+    if(get_client_id is not None):
+        return get_client_id[0] 
+    return get_client_id
+def has_history():
+    get_history = 'Select 1 FROM FuelQuote WHERE client_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(get_history,get_clientID())
+            get_history = cursor.fetchone()
+            conn.commit()
+    if(get_history is None):
+        return False
+    return True
+    
+
+
 users = []
 
 class User:
@@ -33,23 +98,35 @@ class User:
     
     def get_password(self):
         return self.password
-    
+    def add_profile(self):
+        with get_conn() as conn, conn.cursor() as cursor:
+            query = 'INSERT INTO UserCredentials (username, encrypted_password)VALUES (%s,%s)'
+            vals =(self.username,hash_password(self.password))
+            cursor.execute(query,vals)
+            conn.commit()
+         
+
+
+
+
+
 def edit_user(name, address1, address2, city, state, zipcode):
-    session_user = session.get('username')
-    if session_user:
-        for user in users:
-            if session_user == user.get_username():
-                user.name = name
-                user.address1 = address1
-                user.address2 = address2
-                user.city = city
-                user.state = state
-                user.zipcode = zipcode
-                return True
-    else:
-        return False
+    with get_conn() as conn, conn.cursor() as cursor:
+        query = "INSERT INTO ClientInformation (name, address1, address2, city, state, zipcode,user_credentials_id)VALUES (%s,%s,%s,%s,%s,%s,%s) "
+        vals = (name,address1,address2,city,state,zipcode,get_userID())
+        cursor.execute(query,vals)
+        conn.commit()
+
+
 
 def delete_user():
+    with get_conn() as conn, conn.cursor() as cursor:
+            query = 'DELETE FROM UserCredentials WHERE username = %s'
+            vals =(session['username'])
+            cursor.execute(query,vals)
+            conn.commit()
+    del session['username']
+    return True
     index = 0
     session_user = session.get('username')
     if session_user:
@@ -60,42 +137,71 @@ def delete_user():
             index += 1
     return False
 
-fuel_quotes = [
-        {'clientName': 'Sahib Singh', 'clientAddress': '321 bigandtall, Houston, TX', 'gallonsRequested': 5, 'deliveryDate': '2024-01-01', 'pricePerGallon': '3.00', 'totalAmountDue': '$15.00'},
-        {'clientName': 'John Doe', 'clientAddress': '123 Elm St, New York, NY', 'gallonsRequested': 10, 'deliveryDate': '2024-01-15', 'pricePerGallon': '2.75', 'totalAmountDue': '$27.50'}
-    ]
 
-def add_fuel_quote(fuel_quotes, client_name, client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
-    new_quote = {
-        'clientName': client_name,
-        'clientAddress': client_address,
-        'gallonsRequested': gallons_requested,
-        'deliveryDate': delivery_date,
-        'pricePerGallon': price_per_gallon,
-        'totalAmountDue': total_amount_due
-    }
-    fuel_quotes.append(new_quote)
+def get_all_fuel_quotes_client():
+    get_history = 'Select * FROM FuelQuote WHERE client_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+            cursor.execute(get_history,get_clientID())
+            get_history = cursor.fetchall()
+            conn.commit()
+    print(get_history)
+    return get_history
+
+
+def add_fuel_quote( client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
+    insert_quote= 'INSERT INTO FuelQuote (client_id,gallons_requested, delivery_address,delivery_date,suggested_price_per_gallon,total_amount_due)VALUES (%s,%s,%s,%s,%s,%s)'
+    with get_conn() as conn, conn.cursor() as cursor:
+            vals =(get_clientID(),gallons_requested,client_address,delivery_date,price_per_gallon,total_amount_due)
+            cursor.execute(insert_quote,vals)
+            conn.commit()
+
+def get_profile_data():
+    place_holder_start = {'name': '','address1': '','address2': '','city': '','state': '','zipcode': ''}
+
+    get_client_info = 'Select name, address1, address2,city,state, zipcode FROM ClientInformation WHERE user_credentials_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            #Use this when you need to send data back as a Dictionary instead of a tuple
+            cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+
+            cursor.execute(get_client_info,get_userID())
+            get_client_info = cursor.fetchone()
+            conn.commit()
+
+    if(get_client_info ==None):
+        return place_holder_start
+
+    return get_client_info
+def non_valid_point():
+    if ("username" not in session):
+        return True
 
 #Routing Functions 
 @app.route('/') 
 def homepage():
-    #print(current_dir)
     return render_template('index.html',image_filename=r'/img/swif.jpg')
 
 #Landing Page for the Order Form 
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
+    if(non_valid_point()): return redirect('/')
+    if(get_clientID()==None): 
+        return render_template('error_message.html',error_message ="Please complete profile first.",image_filename=r'/img/broken.jpg')
     formQ = QuoteForm()
     if request.method =="GET":
-         return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
     if formQ.validate_on_submit():
         gallons, address, date = formQ.gallons.data,formQ.deliveryAddress.data,formQ.deliveryDate.data
-        formQ.price.data  = Calculation.Price(gallons,'Texas',False)
-        return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+
+        formQ.price.data  = Calculation.Price(gallons,address,has_history())
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
     else:
-        return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
+
+
 @app.route('/finalize_value',methods=['POST'])
 def confirm_quote():
+    if(non_valid_point()): return redirect('/')
     if request.method == "POST":
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
@@ -103,15 +209,18 @@ def confirm_quote():
         Gallons = data_incoming.get('gallons')
         Date = data_incoming.get('date')
         Address = data_incoming.get('address')
-        add_fuel_quote(fuel_quotes, 'New Name', Address, Gallons, Date, Suggested_Price, Total_Amount)
+        add_fuel_quote( Address, Gallons, Date, Suggested_Price, Total_Amount)
 
     return 'Success',200
 
 
-# profile --> sebastian
+
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    return render_template('profile.html', edit=EditProfile(), delete=DeleteProfile())
+    if (non_valid_point()): return redirect('/')
+    profile_data=get_profile_data()
+    return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
+
 
 @app.route('/profile/edit', methods=['POST'])
 def edit_profile():
@@ -124,36 +233,25 @@ def edit_profile():
         state = edit.state.data
         zipcode = edit.zipcode.data
         # No database implementation yet
-        if edit_user(name, address1, address2, city, state, zipcode):
-            return redirect('/profile')
-        else: 
-            # TODO: add new route for unsuccessful edit
-            return redirect('/profile')
+        edit_user(name, address1, address2, city, state, zipcode)
+        return redirect('/profile')
     else:
         return render_template('profile.html', edit=edit, delete=DeleteProfile())
 
-# profile --> sebastian
+
+
 @app.route('/profile/delete', methods=['POST'])
 def delete_profile():
     delete = DeleteProfile()
     if delete.validate_on_submit(): 
         # No database implementation yet
         if delete_user():
-            return redirect('/signup')
-        else: 
-            # TODO: add new route for unsuccessful deletion
-            return redirect('/signup')
+            return redirect('/') #send them back home upon deletion
+        else: # TODO: add new route for unsuccessful deletion
+            return redirect('/')
     else:
         return render_template('profile.html', edit=EditProfile(), delete=delete)
-# @app.route('/signup', methods=['POST','GET'])
-# def sign_up():
-#     if request.method == 'POST':
-#         username = request.form['username']
-#         password = request.form['password']
-#         users[username] = password
-#         return render_template('login.html')
-#     elif request.method == 'GET':
-#         return render_template('signup.html')
+
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
     formS = SignupForm() 
@@ -162,7 +260,8 @@ def sign_up():
         username = formS.username.data
         password = formS.password.data
         user = User(username, password)
-        users.append(user)
+        user.add_profile()
+        #users.append(user)
         return render_template('login.html', form=LoginForm())
     else:
         return render_template('signup.html', form=formS)
@@ -174,21 +273,22 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
-        for user in users:
-            if username == user.get_username() and password == user.get_password():
-                session["username"] = username
-                return redirect('/profile')
-        return '<h1>invalid credentials!</h1>'
-        """
-        if username in users and users[username] == password:
-            edit = EditProfile()
-            delete = DeleteProfile()
-            return render_template ('profile.html', edit=edit, delete=delete)
-        else:
-            return '<h1>invalid credentials!</h1>'
-        """
+        # for user in users:
+        #     if username == user.get_username() and password == user.get_password():
+        #         session["username"] = username
+        #         return redirect('/profile')
+        if(check_login(username,password)):
+            session["username"] = username
+            return redirect('/profile')
+        return render_template('error_message.html',error_message ="This account may not exist. Verify login.",image_filename=r'/img/broken.jpg')
     else:
         return render_template('login.html',form=form)
+   
+@app.route('/clear_session')
+def clear_out():
+    del session['username']
+    return 'Success',200
+
 
 @app.route('/styles.css')
 def style_css():

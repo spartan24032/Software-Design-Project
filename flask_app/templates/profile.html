@@ -268,6 +268,42 @@
     border: 1px solid #D9D9D9;
     margin: 1rem 0 1rem 0;
   }
+  .profile-container {
+    padding: 1.75rem 1.75rem 1.25rem 1.75rem;
+    width: 20rem;
+    border: 1px solid #d9d9d9;
+    border-radius: 0.5rem;
+    background-color: white;
+    margin: 2.5rem 0 2rem 4rem;
+}
+
+.profile-wrapper {
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    width: 100%;
+}
+
+.profile-label {
+    margin: 0.5rem 0 0 0;
+}
+
+.profile-field {
+    display: flex;
+    margin-top: 0.5rem;
+    width: 100%; /* Ensure same width as other container */
+}
+
+.profile-info {
+    padding: 0.5rem 1rem 0.5rem 0.5rem;
+    border-radius: 0.3rem;
+    width: 100%;
+    background-color: #f9fbff;
+    border: 1px solid #d9d9d9;
+}
+
+
+
 
 </style>
 
@@ -282,19 +318,50 @@
       </ul>
     </nav>
     <div class="nav-buttons" style="margin-right: 1rem;">
-      <button class="sign-up button">
-        <a href="/" style="text-decoration: none; cursor: pointer; color: white">Sign Out</a>
+      <button id= "clear_session" class="sign-up button">
+        <a   style="text-decoration: none; cursor: pointer; color: white">Sign Out </a>
       </button>
     </div>
   </header>
   <section id="profile-management">
     <navbar class="profile-nav">
       <ul class="profile-nav-list">
-        <li class="profile-nav-item profile-nav-item-active" id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
+        <li class="profile-nav-item profile-nav-item-active" id='view-profile-link'  onclick="switchForm('view-profile-link')">View Profile</li>
+        <li class="profile-nav-item " id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
         <li class="profile-nav-item" id="delete-profile-link"  onclick="switchForm('delete-profile-link')">Delete Profile</li>
       </ul>
     </navbar>
-    <div id="edit-profile" style="display: flex; flex-direction: column;">
+    <!-- profile_view.html -->
+<div id="view-profile" style="display: flex; flex-direction: column;" class="profile-container">
+  <div class="profile-wrapper">
+    <label class="profile-label">Name</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.name }}</p>
+    </div>
+    <label class="profile-label">Address 1</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.address1 }}</p>
+    </div>
+    <label class="profile-label">Address 2</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.address2 }}</p>
+    </div>
+    <label class="profile-label">State</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.state }}</p>
+    </div>
+    <label class="profile-label">City</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.city }}</p>
+    </div>
+    <label class="profile-label">Zipcode</label>
+    <div class="profile-field">
+        <p class="profile-info">{{ profile_data.zipcode }}</p>
+    </div>
+</div>
+</div>
+
+    <div id="edit-profile" style="display: none; flex-direction: column;">
       <form class="edit-form" method="POST" action="/profile/edit">
           {{ edit.csrf_token }}
           {{ edit.name.label(class='form-label') }}
@@ -388,32 +455,72 @@
     </div>
   </section>
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   editForm = document.getElementById('edit-profile');
   deleteForm = document.getElementById('delete-profile');
+  viewProfile = document.getElementById('view-profile');
 
   editButton = document.getElementById('edit-profile-link');
   deleteButton = document.getElementById('delete-profile-link');
+  viewButton = document.getElementById('view-profile-link');
 
   function switchForm(link){
     if(link === 'delete-profile-link' && deleteForm.style.display == 'none'){
       editForm.style.display = 'none';
+      viewProfile.style.display ='none';
       deleteForm.style.display = 'flex';
 
       editButton.classList.remove('profile-nav-item-active');
+      viewButton.classList.remove('profile-nav-item-active');
+
       deleteButton.classList.add('profile-nav-item-active');
     }
     else if(link === 'edit-profile-link' && editForm.style.display == 'none'){
       deleteForm.style.display = 'none';
+      viewProfile.style.display ='none';
       editForm.style.display = 'flex';
 
+      viewButton.classList.remove('profile-nav-item-active');
       deleteButton.classList.remove('profile-nav-item-active');
+
       editButton.classList.add('profile-nav-item-active');
     }
+    else if(link === 'view-profile-link' && viewProfile.style.display == 'none'){
+      deleteForm.style.display = 'none';
+      editForm.style.display = 'none';
+
+      viewProfile.style.display ='flex';
+
+      editButton.classList.remove('profile-nav-item-active');
+      deleteButton.classList.remove('profile-nav-item-active');
+
+      viewButton.classList.add('profile-nav-item-active');
+
   }
+}
 
   editButton.addEventListener('click', switchForm);
   deleteButton.addEventListener('click', switchForm);
+  viewButton.addEventListener('click',switchForm)
 
+
+  $(document).ready(function(){
+    $("#clear_session").click(function(){
+      $.ajax({
+            url: '/clear_session',
+            method: 'GET', 
+            success: function(response) {
+                alert('Logged Out!');
+                window.location.href = "/";
+                
+                console.log('Container content sent successfully');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error sending container content: ' + error);
+            }
+        });
+    });
+});
 </script>
 </html>

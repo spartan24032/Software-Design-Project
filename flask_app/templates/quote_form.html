@@ -201,7 +201,6 @@ background-color: #d81a1a;
                     <th colspan="6"><h2>Fuel Quote History</h2></th>
                 </tr>
                 <tr>
-                    <th>Client Name</th>
                     <th>Client Address</th>
                     <th>Gallons Requested</th>
                     <th>Delivery Date</th>
@@ -212,12 +211,11 @@ background-color: #d81a1a;
             <tbody >
                 {% for quote in fuel_quotes %}
                 <tr>
-                    <td>{{ quote.clientName }}</td>
-                    <td>{{ quote.clientAddress }}</td>
-                    <td>{{ quote.gallonsRequested }}</td>
-                    <td>{{ quote.deliveryDate }}</td>
-                    <td>{{ quote.pricePerGallon }}</td>
-                    <td>{{ quote.totalAmountDue }}</td>
+                    <td>{{ quote.delivery_address }}</td>
+                    <td>{{ quote.gallons_requested }}</td>
+                    <td>{{ quote.delivery_date }}</td>
+                    <td>{{ quote.suggested_price_per_gallon }}</td>
+                    <td>{{ quote.total_amount_due }}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -58,11 +58,15 @@ def get_userID():
             get_user_id= cursor.fetchone()[0]
     return get_user_id
 def get_clientID():
-    get_client_id  = 'Select client_id FROM UserCredentials WHERE user_credentials_id = %s'
+    get_client_id  = 'Select client_id FROM ClientInformation WHERE user_credentials_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor.execute(get_client_id,get_userID())
-            get_client_id = cursor.fetchone()[0]
-    return get_client_id 
+            get_client_id = cursor.fetchone()
+    if(get_client_id is not None):
+        return get_client_id[0] 
+    return get_client_id
+# def has_history():
+#     get_history = 'Select 1 FROM FuelQuote WHERE clientID = %s'
 
 users = []
 
@@ -148,7 +152,7 @@ def get_profile_data():
             cursor.execute(get_client_info,get_userID())
             get_client_info = cursor.fetchone()
             conn.commit()
-            
+
     if(get_client_info ==None):
         return place_holder_start
 
@@ -166,6 +170,8 @@ def homepage():
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
     if(non_valid_point()): return redirect('/')
+    if(get_clientID()==None): 
+        return render_template('error_message.html',error_message ="Please complete profile first.",image_filename=r'/img/broken.jpg')
     formQ = QuoteForm()
     if request.method =="GET":
          return render_template("quote_form.html",form=formQ,fuel_quotes=fuel_quotes)

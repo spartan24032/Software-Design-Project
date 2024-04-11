@@ -37,12 +37,10 @@ class SignupForm(FlaskForm):
     submit = SubmitField('Sign Up')
     def validate_username(self, username ):
         with get_conn() as conn, conn.cursor() as cursor:
-            print(username.data)
             query = 'Select 1 FROM UserCredentials WHERE username = %s'
             vals =(username.data)
             cursor.execute(query,vals)
             login_present = cursor.fetchone()
             conn.commit()
-            print(login_present)
             if(login_present is not None):
                 raise ValidationError('This username already has a login!')

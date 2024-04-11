@@ -77,11 +77,20 @@ body {
 .signup-link:hover {
     text-decoration: underline;
 }
+.back-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
 
     </style>
 </head>
 
 <body>
+    <a href="javascript:history.back()" class="back-link">Back</a>
     <div class="login-container">
         <form method="POST" action="/login" class="login-form">
             <h2>Login</h2>

@@ -513,6 +513,7 @@
             success: function(response) {
                 alert('Logged Out!');
                 window.location.href = "/";
+                window.history.go(-(window.history.length - 1));
                 
                 console.log('Container content sent successfully');
             },

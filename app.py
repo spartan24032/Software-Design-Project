@@ -286,6 +286,8 @@ def login():
    
 @app.route('/clear_session')
 def clear_out():
+    if('username' not in session): 
+        return redirect('/')
     del session['username']
     return 'Success',200
 

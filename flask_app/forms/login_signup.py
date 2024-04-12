@@ -2,27 +2,23 @@ from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, EqualTo,ValidationError
+import os
 
 #app = Flask(__name__)
 #app.config['SECRET_KEY'] = 'your_secret_key'
 
 import pymysql
-f = None
-try:
-    f = open('SQL_INFO.env', 'r')
-except:
-    print("SQL_INFO.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
-    exit(1)
-
-env_lines = f.read().splitlines()
-
 def get_conn():
-    return pymysql.connect(
-        host=env_lines[0].strip(),
-        user=env_lines[1].strip(),
-        password=env_lines[2].strip(),
-        database=env_lines[3].strip()
-    )
+    try:
+        return pymysql.connect(
+            host=os.environ.get('MYSQL_HOST', default='MYSQL_HOST'),
+            user=os.environ.get('MYSQL_USER', default='MYSQL_USER'),
+            password=os.environ.get('MYSQL_PASSWORD', default='MYSQL_PASSWORD'),
+            database=os.environ.get('MYSQL_DB', default='MYSQL_DB')
+        )
+    except Exception as e:
+        print(f"Error occurred while connecting to the databaseas: {e}")
+        exit(1)
 
 
 class LoginForm(FlaskForm):

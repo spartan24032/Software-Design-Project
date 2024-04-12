@@ -27,7 +27,7 @@ def get_conn():
             database=os.environ.get('MYSQL_DB', default='MYSQL_DB')
         )
     except Exception as e:
-        print(f"Error occurred while connecting to the database: {e}")
+        print(f"Error occurred while connecting to the database_main: {e}")
         exit(1)
 
 #Hash Passwords Into the Database
@@ -140,7 +140,7 @@ def get_all_fuel_quotes_client():
             cursor.execute(get_history,get_clientID())
             get_history = cursor.fetchall()
             conn.commit()
-    print(get_history)
+    #print(get_history)
     return get_history
 
 
@@ -187,8 +187,10 @@ def fuel_quote_form():
          return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
     if formQ.validate_on_submit():
         gallons, address, date = formQ.gallons.data,formQ.deliveryAddress.data,formQ.deliveryDate.data
+        # Assuming 'gallons', 'address', and 'has_history()' are defined somewhere
+        calculation_instance = Calculation()
 
-        formQ.price.data  = Calculation.Price(gallons,address,has_history())
+        formQ.price.data  = calculation_instance.Price(gallons, address, has_history())
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
     else:
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
@@ -292,5 +294,5 @@ def style_css():
     return send_file(os.path.dirname(__file__)+r'flask_app/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)),debug=True)
 

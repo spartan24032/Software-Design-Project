@@ -3,21 +3,17 @@ import pymysql
 import hashlib
 from flask_app import create_app
 from app import app
+import os
 
 # Define a function to establish the database connection
 def get_conn():
     try:
-        with open('SQL_INFO.env', 'r') as f:
-            env_lines = f.read().splitlines()
-            return pymysql.connect(
-                host=env_lines[0].strip(),
-                user=env_lines[1].strip(),
-                password=env_lines[2].strip(),
-                database=env_lines[3].strip()
-            )
-    except FileNotFoundError:
-        print("SQL_INFO.env not found. Create a new file called SQL_INFO.env, and put the host, username, password, database in this new file, each separated by line")
-        exit(1)
+        return pymysql.connect(
+            host=os.environ.get('MYSQL_HOST', default='MYSQL_HOST'),
+            user=os.environ.get('MYSQL_USER', default='MYSQL_USER'),
+            password=os.environ.get('MYSQL_PASSWORD', default='MYSQL_PASSWORD'),
+            database=os.environ.get('MYSQL_DB', default='MYSQL_DB')
+        )
     except Exception as e:
         print(f"Error occurred while connecting to the database: {e}")
         exit(1)
@@ -40,6 +36,7 @@ def hash():
 
 @pytest.fixture()
 def test_client(conn):
+
     # Configure app for testing
     app.config.from_object('config.TestingConfig')
 

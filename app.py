@@ -18,28 +18,23 @@ from PricingModel import Calculation
 
 app = create_app()
 
-#
-f = None
-try:
-    f = open('SQL_INFO.env', 'r')
-except:
-    print("SQL_INFO.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
-    exit(1)
-
-env_lines = f.read().splitlines()
-
 def get_conn():
-    return pymysql.connect(
-        host=env_lines[0].strip(),
-        user=env_lines[1].strip(),
-        password=env_lines[2].strip(),
-        database=env_lines[3].strip()
-    )
+    try:
+        return pymysql.connect(
+            host=os.environ.get('MYSQL_HOST', default='MYSQL_HOST'),
+            user=os.environ.get('MYSQL_USER', default='MYSQL_USER'),
+            password=os.environ.get('MYSQL_PASSWORD', default='MYSQL_PASSWORD'),
+            database=os.environ.get('MYSQL_DB', default='MYSQL_DB')
+        )
+    except Exception as e:
+        print(f"Error occurred while connecting to the database: {e}")
+        exit(1)
+
 #Hash Passwords Into the Database
 def hash_password(password): return hashlib.sha256(password.encode('utf-8')).digest()    
 
 def check_login(username,password):
-    query = 'Select encrypted_password From UserCredentials WHERE username =%s'
+    query = 'SELECT encrypted_password FROM UserCredentials WHERE username =%s'
     vals = username
     #print(hash_password(password))
     with get_conn() as conn, conn.cursor() as cursor:

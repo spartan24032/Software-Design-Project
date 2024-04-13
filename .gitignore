@@ -1,6 +1,6 @@
 # Flask/Python files
 .pytest_cache
-SQL_INFO.env
+SQL_INFO
 .env
 __pycache__
 .coverage
@@ -15,4 +15,5 @@ dist
 dist-ssr
 coverage
 *.local
-SQL_INFO.env
+SQL_INFO
+*.env

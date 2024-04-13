@@ -8,9 +8,7 @@ def test_fuel_quote_get(test_client):
     response = test_client.get('/quote_form')
 
     assert response.status_code == 200
-
-
-    assert response.status_code == 200
+    
 def test_deliveryDate_future_date(test_client):
         form = QuoteForm(deliveryDate=date.today())
         assert not form.validate()

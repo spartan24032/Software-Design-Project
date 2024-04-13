@@ -1,5 +1,5 @@
 from flask import session
-from app import users, User
+from app import users, User, get_userID, get_clientID
 
 def test_create_user(test_client):
 	username = "test_user"
@@ -95,5 +95,50 @@ def test_delete_user(test_client):
 		data={'password': password},
 		follow_redirects=True
 	)
+	# after deletion, redirect to homepage
 	assert len(response_delete.history) == 1
-	assert response_delete.request.path == "/signup"
+	assert response_delete.request.path == "/"
+
+def test_get_user_ID(test_app, test_client, conn, hash):
+	
+	username = 'test_user23'
+	password = 'test_pass23'
+
+	# Delete duplicate username, if any
+	with conn.cursor() as cursor:
+		query = "DELETE FROM UserCredentials WHERE username = %s"
+		vals = (username)
+		cursor.execute(query, vals)
+	conn.commit()
+
+	# Add test user 
+	with conn.cursor() as cursor:
+		query = "INSERT INTO UserCredentials (username, encrypted_password) VALUES (%s,%s)"
+		vals = (username, hash(password))
+		cursor.execute(query, vals)
+	conn.commit()
+	
+	userID = 0
+	# Add session values
+	with test_client.session_transaction() as session:
+		session['username'] = 'test_user23'
+		# UserCredentials primary key auto increments, therefore the client ID is the last row
+		userID = cursor.lastrowid
+
+	# Get user ID. Since get_userID accesses the session, need to use the app.test_request_context() 
+ 	# context manager to not get a working outside request context error
+	with test_app.test_request_context():
+		testID = get_userID()
+
+	assert userID == testID
+
+	# Delete test user and session
+	with conn.cursor() as cursor:
+		query = "DELETE FROM UserCredentials WHERE username = %s"
+		vals = (username)
+		cursor.execute(query, vals)
+	conn.commit()
+
+	with test_client.session_transaction() as session:
+		session.pop('username', None)
+

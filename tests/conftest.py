@@ -5,14 +5,23 @@ from flask_app import create_app
 from app import app
 import os
 
+f = None
+try:
+    f = open('SQL_INFO.env', 'r')
+except:
+    print("SQL_INFO.env not found. Create a new file called coogmusic.env, and put the host, username, password, database in this new file, each separated by line")
+    exit(1)
+
+env_lines = f.read().splitlines()
+
 # Define a function to establish the database connection
 def get_conn():
     try:
         return pymysql.connect(
-            host=os.environ.get('MYSQL_HOST', default='MYSQL_HOST'),
-            user=os.environ.get('MYSQL_USER', default='MYSQL_USER'),
-            password=os.environ.get('MYSQL_PASSWORD', default='MYSQL_PASSWORD'),
-            database=os.environ.get('MYSQL_DB', default='MYSQL_DB')
+            host=env_lines[0].strip(),
+            user=env_lines[1].strip(),
+            password=env_lines[2].strip(),
+            database=env_lines[3].strip()
         )
     except Exception as e:
         print(f"Error occurred while connecting to the database: {e}")
@@ -34,8 +43,15 @@ def hash():
     # Provide the hash function
     return hash_password
 
+# @pytest.fixture()
+# def test_app():
+#     app = create_app()
+#     # Configure app for testing
+#     app.config.from_object('config.TestingConfig')
+#     yield app
+
 @pytest.fixture()
-def test_client(conn):
+def test_client():
 
     # Configure app for testing
     app.config.from_object('config.TestingConfig')

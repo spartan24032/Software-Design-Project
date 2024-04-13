@@ -167,7 +167,7 @@ def get_profile_data():
         return place_holder_start
 
     return get_client_info
-def non_valid_point():
+def non_valid_point(session):
     if ("username" not in session):
         return True
 
@@ -179,7 +179,7 @@ def homepage():
 #Landing Page for the Order Form 
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
-    if(non_valid_point()): return redirect('/')
+    if(non_valid_point(session)): return redirect('/')
     if(get_clientID()==None): 
         return render_template('error_message.html',error_message ="Please complete profile first.",image_filename=r'/img/broken.jpg')
     formQ = QuoteForm()
@@ -198,7 +198,7 @@ def fuel_quote_form():
 
 @app.route('/finalize_value',methods=['POST'])
 def confirm_quote():
-    if(non_valid_point()): return redirect('/')
+    if(non_valid_point(session)): return redirect('/')
     if request.method == "POST":
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
@@ -214,7 +214,7 @@ def confirm_quote():
 
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    if (non_valid_point()): return redirect('/')
+    if (non_valid_point(session)): return redirect('/')
     profile_data=get_profile_data()
     return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
 

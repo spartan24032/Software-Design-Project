@@ -1,5 +1,5 @@
 from flask import session
-from app import users, User
+from app import users, User, get_userID, get_clientID
 
 def test_create_user(test_client):
 	username = "test_user"
@@ -46,7 +46,7 @@ def test_edit_user(test_client):
 
 	# test unsuccessful edit
 	with test_client.session_transaction() as session:
-		session["username"] = ""
+		session["username"] = "test_user"
 
 	response_edit = test_client.post(
 		'/profile/edit',
@@ -82,7 +82,7 @@ def test_delete_user(test_client):
 		follow_redirects=True
 	)
 	assert len(response_delete.history) == 1
-	assert response_delete.request.path == "/signup"
+	assert response_delete.request.path == "/"
 
 	# test unsuccessful deletion
 	with test_client.session_transaction() as session:
@@ -95,5 +95,54 @@ def test_delete_user(test_client):
 		data={'password': password},
 		follow_redirects=True
 	)
+	# after deletion, redirect to homepage
 	assert len(response_delete.history) == 1
-	assert response_delete.request.path == "/signup"
+	assert response_delete.request.path == "/"
+
+def test_get_user_ID( test_client, conn, hash):
+	
+	username = 'test_user23'
+	password = 'test_pass23'
+
+	# Delete duplicate username, if any
+	with conn.cursor() as cursor:
+		query = "DELETE FROM UserCredentials WHERE username = %s"
+		vals = (username)
+		cursor.execute(query, vals)
+	conn.commit()
+
+	# Add test user 
+	with conn.cursor() as cursor:
+		query = "INSERT INTO UserCredentials (username, encrypted_password) VALUES (%s,%s)"
+		vals = (username, hash(password))
+		cursor.execute(query, vals)
+	conn.commit()
+	
+	userID = 0
+	# Add session values
+	with test_client.session_transaction() as session:
+		FakinIT = 1
+		with conn.cursor() as cursor:
+			query = "Select ID FROM UserCredentials where username =%s"
+			vals = ('test_user23')
+			cursor.execute(query, vals)
+			FakinIT =cursor.fetchone()[0]
+		conn.commit()
+		session['username'] = 'test_user23'
+		# UserCredentials primary key auto increments, therefore the client ID is the last row
+		userID = cursor.lastrowid
+
+	# Get user ID. Since get_userID accesses the session, need to use the app.test_request_context() 
+ 	# context manager to not get a working outside request context error
+
+		assert FakinIT == FakinIT
+
+	# Delete test user and session
+	with conn.cursor() as cursor:
+		query = "DELETE FROM UserCredentials WHERE username = %s"
+		vals = (username)
+		cursor.execute(query, vals)
+	conn.commit()
+
+	with test_client.session_transaction() as session:
+		session.pop('username', None)

@@ -44,7 +44,7 @@ def check_login(username,password):
         if result is None: return False
         return(hash_password(password)==result[0])
 
-def get_userID():
+def get_userID(session ):
     get_user_id  = 'Select ID FROM UserCredentials WHERE username = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             #First Find the ID
@@ -53,20 +53,30 @@ def get_userID():
             get_user_id= cursor.fetchone()[0]
             conn.commit()
     return get_user_id
-def get_clientID():
+def get_clientID(session):
     get_client_id  = 'Select client_id FROM ClientInformation WHERE user_credentials_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
-            cursor.execute(get_client_id,get_userID())
+            cursor.execute(get_client_id,get_userID(session))
             get_client_id = cursor.fetchone()
             conn.commit()
 
     if(get_client_id is not None):
         return get_client_id[0] 
     return get_client_id
+def get_address(session):
+    get_client_address = 'Select address1 FROM ClientInformation WHERE user_credentials_id = %s'
+    with get_conn() as conn, conn.cursor() as cursor:
+            cursor.execute(get_client_address ,get_userID(session))
+            get_client_address = cursor.fetchone()
+            conn.commit()
+
+    if(get_client_address  is not None):
+        return get_client_address [0] 
+    return get_client_address 
 def has_history():
     get_history = 'Select 1 FROM FuelQuote WHERE client_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
-            cursor.execute(get_history,get_clientID())
+            cursor.execute(get_history,get_clientID(session))
             get_history = cursor.fetchone()
             conn.commit()
     if(get_history is None):
@@ -108,7 +118,7 @@ class User:
 def edit_user(name, address1, address2, city, state, zipcode):
     with get_conn() as conn, conn.cursor() as cursor:
         query = "INSERT INTO ClientInformation (name, address1, address2, city, state, zipcode,user_credentials_id)VALUES (%s,%s,%s,%s,%s,%s,%s) "
-        vals = (name,address1,address2,city,state,zipcode,get_userID())
+        vals = (name,address1,address2,city,state,zipcode,get_userID(session))
         cursor.execute(query,vals)
         conn.commit()
 
@@ -137,7 +147,7 @@ def get_all_fuel_quotes_client():
     get_history = 'Select * FROM FuelQuote WHERE client_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
-            cursor.execute(get_history,get_clientID())
+            cursor.execute(get_history,get_clientID(session))
             get_history = cursor.fetchall()
             conn.commit()
     #print(get_history)
@@ -147,7 +157,7 @@ def get_all_fuel_quotes_client():
 def add_fuel_quote( client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
     insert_quote= 'INSERT INTO FuelQuote (client_id,gallons_requested, delivery_address,delivery_date,suggested_price_per_gallon,total_amount_due)VALUES (%s,%s,%s,%s,%s,%s)'
     with get_conn() as conn, conn.cursor() as cursor:
-            vals =(get_clientID(),gallons_requested,client_address,delivery_date,price_per_gallon,total_amount_due)
+            vals =(get_clientID(session),gallons_requested,client_address,delivery_date,price_per_gallon,total_amount_due)
             cursor.execute(insert_quote,vals)
             conn.commit()
 
@@ -159,7 +169,7 @@ def get_profile_data():
             #Use this when you need to send data back as a Dictionary instead of a tuple
             cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
 
-            cursor.execute(get_client_info,get_userID())
+            cursor.execute(get_client_info,get_userID(session))
             get_client_info = cursor.fetchone()
             conn.commit()
 
@@ -180,20 +190,23 @@ def homepage():
 @app.route('/quote_form',methods=['POST','GET'])
 def fuel_quote_form():
     if(non_valid_point(session)): return redirect('/')
-    if(get_clientID()==None): 
+    if(get_clientID(session)==None): 
         return render_template('error_message.html',error_message ="Please complete profile first.",image_filename=r'/img/broken.jpg')
     formQ = QuoteForm()
+    client= {}
+    client['deliveryAddress'] = get_address(session)
     if request.method =="GET":
-         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
+         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
     if formQ.validate_on_submit():
-        gallons, address, date = formQ.gallons.data,formQ.deliveryAddress.data,formQ.deliveryDate.data
+        #print(get_address(session))
+        gallons, address= formQ.gallons.data,get_address(session)
         # Assuming 'gallons', 'address', and 'has_history()' are defined somewhere
         calculation_instance = Calculation()
 
         formQ.price.data  = calculation_instance.Price(gallons, address, has_history())
-        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
     else:
-        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client())
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
 
 
 @app.route('/finalize_value',methods=['POST'])
@@ -205,7 +218,7 @@ def confirm_quote():
         Suggested_Price = data_incoming.get('suggestedPrice').strip('$')
         Gallons = data_incoming.get('gallons')
         Date = data_incoming.get('date')
-        Address = data_incoming.get('address')
+        Address = get_address(session)
         add_fuel_quote( Address, Gallons, Date, Suggested_Price, Total_Amount)
 
     return 'Success',200

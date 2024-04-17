@@ -147,6 +147,17 @@ background-color: #d81a1a;
         max-height: 300px; /* Adjust the maximum height as needed */
         overflow-y: auto;
     }
+    #deliveryAddress {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
 </style>
 <!DOCTYPE html>
 <html lang="en">
@@ -167,9 +178,8 @@ background-color: #d81a1a;
                 {{ form.gallons.label(class='form-label')}}
                 {{ form.gallons(class="form-input") }}
             </div>
-            <div class="form-group">
-                {{ form.deliveryAddress.label(class='form-label')}}
-                {{ form.deliveryAddress(size=100, class="form-input") }}
+            <div id ="deliveryAddress">
+                {{client.deliveryAddress}}
             </div>
             <div class="form-group">
                 {{ form.deliveryDate.label(class='form-label')}}

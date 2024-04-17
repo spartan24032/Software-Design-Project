@@ -4,7 +4,7 @@ from wtforms.validators import InputRequired, Length, NumberRange, ValidationErr
 from datetime import date
 class QuoteForm(FlaskForm):
     gallons = IntegerField('Gallons', validators=[InputRequired(), NumberRange(min=1)])
-    deliveryAddress = StringField('Delivery Address', validators=[InputRequired(), Length(min=10, max=100)])
+    #deliveryAddress = StringField('Delivery Address', validators=[InputRequired(), Length(min=10, max=100)])
     deliveryDate = DateField('Delivery Date', validators=[InputRequired()])
     submit = SubmitField('Get Quote')
     price = StringField('Price')

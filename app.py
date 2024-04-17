@@ -116,6 +116,13 @@ class User:
 
 
 def edit_user(name, address1, address2, city, state, zipcode):
+    if(get_clientID(session) ==None):
+        with get_conn() as conn, conn.cursor() as cursor:
+            query = "INSERT INTO ClientInformation (name, address1, address2, city, state, zipcode,user_credentials_id)VALUES (%s,%s,%s,%s,%s,%s,%s) "
+            vals = (name,address1,address2,city,state,zipcode,get_userID(session))
+            cursor.execute(query,vals)
+            conn.commit()
+        return
     with get_conn() as conn, conn.cursor() as cursor:
         query = """
         UPDATE ClientInformation 
@@ -275,6 +282,8 @@ def delete_profile():
 
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
+    if('username' in session):
+        return redirect('/profile')
     formS = SignupForm() 
     #print(formS.confirm_password)
     if formS.validate_on_submit():
@@ -290,6 +299,8 @@ def sign_up():
 #add the links to redirect sign in 
 @app.route('/login', methods=['POST','GET'])
 def login():
+    if('username' in session):
+        return redirect('/profile')
     form = LoginForm()
     if form.validate_on_submit():
         username = request.form['username']

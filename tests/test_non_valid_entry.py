@@ -34,6 +34,8 @@ def test_quoteForm_invalid_data(test_client):
 
 # Define a test case for get_all_fuel_quotes_client
 def test_get_all_fuel_quotes_client():
+
+    
     # callin function and puttin result in variable
     result = get_all_fuel_quotes_client()
 

@@ -117,14 +117,25 @@ class User:
 
 def edit_user(name, address1, address2, city, state, zipcode):
     with get_conn() as conn, conn.cursor() as cursor:
-        query = "INSERT INTO ClientInformation (name, address1, address2, city, state, zipcode,user_credentials_id)VALUES (%s,%s,%s,%s,%s,%s,%s) "
-        vals = (name,address1,address2,city,state,zipcode,get_userID(session))
-        cursor.execute(query,vals)
+        query = """
+        UPDATE ClientInformation 
+        SET 
+            name = %s, 
+            address1 = %s, 
+            address2 = %s, 
+            city = %s, 
+            state = %s, 
+            zipcode = %s
+        WHERE 
+            user_credentials_id = %s
+    """
+        vals = (name, address1, address2, city, state, zipcode, get_userID(session))
+        cursor.execute(query, vals)
         conn.commit()
 
 
 
-def delete_user():
+def delete_user(session):
     with get_conn() as conn, conn.cursor() as cursor:
             query = 'DELETE FROM UserCredentials WHERE username = %s'
             vals =(session['username'])
@@ -255,7 +266,7 @@ def delete_profile():
     delete = DeleteProfile()
     if delete.validate_on_submit(): 
         # No database implementation yet
-        if delete_user():
+        if delete_user(session):
             return redirect('/') #send them back home upon deletion
         else: # TODO: add new route for unsuccessful deletion
             return redirect('/')

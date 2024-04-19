@@ -45,6 +45,8 @@ def test_valid_profile_edit(test_client,conn):
 		data={'name': 'President', 'address1': '1600 Pennsylvania Avenue, N.W.', 'address2': 'Not Applicable', 'city': 'Washington', 'state': 'DC', 'zipcode': '20500'},
 		follow_redirects=True
 	)
+
+	# If successful, should redirect to /profile
 	assert len(response.history) == 1
 	assert response.request.path == "/profile"
 
@@ -98,6 +100,8 @@ def test_invalid_profile_edit(test_client, conn):
 		data={'name': '', 'address1': '', 'address2': '', 'city': '', 'state': '', 'zipcode': ''},
 		follow_redirects=True
 	)
+
+	# If unsuccessful, should redirect to /profile
 	assert len(response.history) == 1
 	assert response.request.path == "/profile"
 
@@ -140,18 +144,23 @@ def test_profile_deletion(test_client,conn,hash):
 	response = test_client.post(
 			'/profile/delete',
 			method = 'POST', 
-			data={'password': password},  # Invalid password
+			data={'password': password},
 			follow_redirects=True
 		)
+	
+	# Test if deleted 
+	with conn.cursor() as cursor:
+		query = "SELECT * FROM UserCredentials WHERE username = %s"
+		vals = (username)
+		cursor.execute(query, vals)
+		row = cursor.fetchone()
+	conn.commit()
+
+	# If there is no row fetched by the query, it means deletion was successful
+	assert row == None
 	
 	assert len(response.history) == 1
 	assert response.request.path == "/"
 
-	# Teardown
-	with conn.cursor() as cursor:
-		query = "DELETE FROM UserCredentials WHERE username = %s"
-		vals = (username)
-		cursor.execute(query, vals)
-	conn.commit()
 	
 

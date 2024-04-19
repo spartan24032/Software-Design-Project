@@ -336,27 +336,51 @@
   <div class="profile-wrapper">
     <label class="profile-label">Name</label>
     <div class="profile-field">
-        <p class="profile-info">{{ profile_data.name }}</p>
+        <p class="profile-info">
+          {% if profile_data is defined %}
+            {{ profile_data.name }}
+          {% endif %}
+        </p>
     </div>
     <label class="profile-label">Address 1</label>
     <div class="profile-field">
-        <p class="profile-info">{{ profile_data.address1 }}</p>
+      <p class="profile-info">
+        {% if profile_data is defined %}
+          {{ profile_data.address1 }}
+        {% endif %}
+      </p>
     </div>
     <label class="profile-label">Address 2</label>
     <div class="profile-field">
-        <p class="profile-info">{{ profile_data.address2 }}</p>
+      <p class="profile-info">
+        {% if profile_data is defined %}
+          {{ profile_data.address2 }}
+        {% endif %}
+      </p>
     </div>
     <label class="profile-label">State</label>
     <div class="profile-field">
-        <p class="profile-info">{{ profile_data.state }}</p>
+      <p class="profile-info">
+        {% if profile_data is defined %}
+          {{ profile_data.state }}
+        {% endif %}
+      </p>
     </div>
     <label class="profile-label">City</label>
     <div class="profile-field">
-        <p class="profile-info">{{ profile_data.city }}</p>
+      <p class="profile-info">
+        {% if profile_data is defined %}
+          {{ profile_data.city }}
+        {% endif %}
+      </p>
     </div>
     <label class="profile-label">Zipcode</label>
     <div class="profile-field">
-        <p class="profile-info">{{ profile_data.zipcode }}</p>
+      <p class="profile-info">
+        {% if profile_data is defined %}
+          {{ profile_data.zipcode }}
+        {% endif %}
+      </p>
     </div>
 </div>
 </div>

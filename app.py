@@ -264,7 +264,8 @@ def edit_profile():
         edit_user(name, address1, address2, city, state, zipcode)
         return redirect('/profile')
     else:
-        return render_template('profile.html', edit=edit, delete=DeleteProfile())
+        # Add flash
+        return redirect('/profile')
 
 
 
@@ -274,10 +275,11 @@ def delete_profile():
     if delete.validate_on_submit(): 
         # No database implementation yet
         if delete_user(session):
-            return redirect('/') #send them back home upon deletion
-        else: # TODO: add new route for unsuccessful deletion
+            return redirect('/') # send them back home upon deletion
+        else: # TODO: add new route /error page for unsuccessful deletion
             return redirect('/')
     else:
+        # Add flash instead
         return render_template('profile.html', edit=EditProfile(), delete=delete)
 
 @app.route('/signup', methods=['POST','GET'])

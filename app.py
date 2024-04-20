@@ -1,5 +1,5 @@
 
-from flask import Flask,send_file,jsonify,render_template,request,redirect,session
+from flask import Flask,send_file,jsonify,render_template,request,redirect,session,flash
 from werkzeug.datastructures import ImmutableMultiDict
 from flask_wtf import FlaskForm
 from flask_app import create_app
@@ -245,9 +245,10 @@ def confirm_quote():
 
 @app.route('/profile', methods=['POST', 'GET'])
 def profile():
-    if (non_valid_point(session)): return redirect('/')
-    profile_data=get_profile_data()
-    return render_template('profile.html', profile_data = profile_data,edit=EditProfile(), delete=DeleteProfile())
+    if non_valid_point(session): 
+        return redirect('/')
+    else:
+        return render_template('profile.html',profile_data=get_profile_data(),edit=EditProfile(), delete=DeleteProfile())
 
 
 @app.route('/profile/edit', methods=['POST'])
@@ -260,27 +261,24 @@ def edit_profile():
         city = edit.city.data
         state = edit.state.data
         zipcode = edit.zipcode.data
-        # No database implementation yet
         edit_user(name, address1, address2, city, state, zipcode)
-        return redirect('/profile')
+        flash('Profile successfully updated!', 'confirm')
+        return render_template("profile.html",profile_data=get_profile_data(), edit=edit, delete=DeleteProfile())
     else:
-        # Add flash
-        return redirect('/profile')
-
+        flash('Form has invalid input(s)!', 'error')
+        return render_template("profile.html",profile_data=get_profile_data(), edit=edit, delete=DeleteProfile())
 
 
 @app.route('/profile/delete', methods=['POST'])
 def delete_profile():
     delete = DeleteProfile()
     if delete.validate_on_submit(): 
-        # No database implementation yet
-        if delete_user(session):
-            return redirect('/') # send them back home upon deletion
-        else: # TODO: add new route /error page for unsuccessful deletion
-            return redirect('/')
+        delete_user(session)
+        flash('Deletion was successful!', 'confirm')
+        return render_template('index.html',image_filename=r'/img/swif.jpg')
     else:
-        # Add flash instead
-        return render_template('profile.html', edit=EditProfile(), delete=delete)
+        flash('Password did not match with our database!', 'error')
+        return render_template("profile.html",profile_data=get_profile_data(), edit=EditProfile(), delete=delete)
 
 @app.route('/signup', methods=['POST','GET'])
 def sign_up():
@@ -293,7 +291,6 @@ def sign_up():
         password = formS.password.data
         user = User(username, password)
         user.add_profile()
-        #users.append(user)
         return render_template('login.html', form=LoginForm())
     else:
         return render_template('signup.html', form=formS)
@@ -307,10 +304,6 @@ def login():
     if form.validate_on_submit():
         username = request.form['username']
         password = request.form['password']
-        # for user in users:
-        #     if username == user.get_username() and password == user.get_password():
-        #         session["username"] = username
-        #         return redirect('/profile')
         if(check_login(username,password)):
             session["username"] = username
             return redirect('/profile')

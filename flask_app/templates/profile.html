@@ -59,6 +59,12 @@
     font-weight: bold;
   }
 
+  .navlist-item a {
+    text-decoration: none; 
+    cursor: pointer; 
+    color: white;
+  }
+
   .nav-buttons {
     display: flex;
     width: 12rem;
@@ -100,7 +106,7 @@
     display: flex;
     flex-direction: column;
     background-color: #F9FBFF;
-    padding-top: 2rem;
+    padding-top: 1rem;
     min-height: 100vh;
     max-height: fit-content;
   }
@@ -154,6 +160,7 @@
     display: flex;
     flex-direction: column;
     background-color: white;
+    padding-bottom: 0.5rem;
     width: 100%;
   }
 
@@ -188,6 +195,7 @@
     padding: 0.5rem 1rem 0.5rem 0.5rem;
     border-radius: 0.3rem;
     width: 100%;
+    min-height: 16px;
     background-color: #F9FBFF;
     display: inline-block;
     border: 1px solid #D9D9D9;
@@ -284,26 +292,44 @@
     width: 100%;
 }
 
-.profile-label {
-    margin: 0.5rem 0 0 0;
+.flashes {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
 }
 
-.profile-field {
-    display: flex;
-    margin-top: 0.5rem;
-    width: 100%; /* Ensure same width as other container */
+.flash-confirm {
+  position: relative;
+  width: 80%;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 1rem 0.5rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: #00db85;
+  color: white;
+  font-weight: bold;
+  border: none; 
 }
 
-.profile-info {
-    padding: 0.5rem 1rem 0.5rem 0.5rem;
-    border-radius: 0.3rem;
-    width: 100%;
-    background-color: #f9fbff;
-    border: 1px solid #d9d9d9;
+.flash-error {
+  position: relative;
+  width: 80%;
+  margin-bottom: 0.5rem;
+  padding: 1rem 1.25rem 1rem 1.25rem;
+  border-radius: 0.25rem;
+  background-color: #F94F4F;
+  color: white;
+  font-weight: bold;
+  border: none;
 }
 
-
-
+.close-flash {
+  position: absolute;
+  top: 4px;
+  cursor: pointer;
+  right: 10px;
+}
 
 </style>
 
@@ -314,77 +340,95 @@
     </div>
     <nav id="navbar" style="margin-right: 1rem;">
       <ul class="navlist">
-        <li class="navlist-item"><a href="/quote_form" style="text-decoration: none; cursor: pointer; color: white">File Quote Management</a></li>
+        <li class="navlist-item"><a href="/quote_form">File Quote Management</a></li>
       </ul>
     </nav>
     <div class="nav-buttons" style="margin-right: 1rem;">
       <button id= "clear_session" class="sign-up button">
-        <a   style="text-decoration: none; cursor: pointer; color: white">Sign Out </a>
+        <a style="text-decoration: none; cursor: pointer; color: white">Sign Out</a>
       </button>
     </div>
   </header>
   <section id="profile-management">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes" id="flashes">
+          {% for category, message in messages %}
+            {% if category == 'confirm' %}
+              <li class="flash-confirm" id="flash-confirm">
+                {{ message }}
+                <span class="close-flash" id="close-confirm" onclick="closeFlashMessage('flash-confirm')">&#10005</span>
+              </li>
+            {% elif category == 'error' %}
+              <li class="flash-error" id="flash-error">
+                {{ message }}
+                <span class="close-flash" id="close-error" onclick="closeFlashMessage('flash-error')">&#10005</span>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
     <navbar class="profile-nav">
       <ul class="profile-nav-list">
-        <li class="profile-nav-item profile-nav-item-active" id='view-profile-link'  onclick="switchForm('view-profile-link')">View Profile</li>
-        <li class="profile-nav-item " id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
-        <li class="profile-nav-item" id="delete-profile-link"  onclick="switchForm('delete-profile-link')">Delete Profile</li>
+        <li class="profile-nav-item profile-nav-item-active" id='view-profile-link' onclick="switchForm('view-profile-link')">View Profile</li>
+        <li class="profile-nav-item" id="edit-profile-link" onclick="switchForm('edit-profile-link')">Edit Profile</li>
+        <li class="profile-nav-item" id="delete-profile-link" onclick="switchForm('delete-profile-link')">Delete Profile</li>
       </ul>
     </navbar>
     <!-- profile_view.html -->
-<div id="view-profile" style="display: flex; flex-direction: column;" class="profile-container">
-  <div class="profile-wrapper">
-    <label class="profile-label">Name</label>
-    <div class="profile-field">
-        <p class="profile-info">
-          {% if profile_data is defined %}
-            {{ profile_data.name }}
-          {% endif %}
-        </p>
+    <div id="view-profile" style="display: flex; flex-direction: column;" class="profile-container">
+      <div class="edit-form">
+        <label class="form-label">Name</label>
+        <div class="form-field">
+          <div class="form-input"> 
+            {% if profile_data is defined %}
+              {{ profile_data.name }}
+            {% endif %}
+          </div>
+        </div>
+        <label class="form-label">Address 1</label>
+        <div class="form-field">
+          <div class="form-input">
+            {% if profile_data is defined %}
+              {{ profile_data.address1 }}
+            {% endif %}
+          </div>
+        </div>
+        <label class="form-label">Address 2</label>
+        <div class="form-field">
+          <div class="form-input">
+            {% if profile_data is defined %}
+              {{ profile_data.address2 }}
+            {% endif %}
+          </div>
+        </div>
+        <label class="form-label">State</label>
+        <div class="form-field">
+          <div class="form-input">
+            {% if profile_data is defined %}
+              {{ profile_data.state }}
+            {% endif %}
+          </div>
+        </div>
+        <label class="form-label">City</label>
+        <div class="form-field">
+          <div class="form-input">
+            {% if profile_data is defined %}
+              {{ profile_data.city }}
+            {% endif %}
+          </div>
+        </div>
+        <label class="form-label">Zipcode</label>
+        <div class="form-field">
+          <div class="form-input">
+            {% if profile_data is defined %}
+              {{ profile_data.zipcode }}
+            {% endif %}
+          </div>
+        </div>
     </div>
-    <label class="profile-label">Address 1</label>
-    <div class="profile-field">
-      <p class="profile-info">
-        {% if profile_data is defined %}
-          {{ profile_data.address1 }}
-        {% endif %}
-      </p>
     </div>
-    <label class="profile-label">Address 2</label>
-    <div class="profile-field">
-      <p class="profile-info">
-        {% if profile_data is defined %}
-          {{ profile_data.address2 }}
-        {% endif %}
-      </p>
-    </div>
-    <label class="profile-label">State</label>
-    <div class="profile-field">
-      <p class="profile-info">
-        {% if profile_data is defined %}
-          {{ profile_data.state }}
-        {% endif %}
-      </p>
-    </div>
-    <label class="profile-label">City</label>
-    <div class="profile-field">
-      <p class="profile-info">
-        {% if profile_data is defined %}
-          {{ profile_data.city }}
-        {% endif %}
-      </p>
-    </div>
-    <label class="profile-label">Zipcode</label>
-    <div class="profile-field">
-      <p class="profile-info">
-        {% if profile_data is defined %}
-          {{ profile_data.zipcode }}
-        {% endif %}
-      </p>
-    </div>
-</div>
-</div>
-
     <div id="edit-profile" style="display: none; flex-direction: column;">
       <form class="edit-form" method="POST" action="/profile/edit">
           {{ edit.csrf_token }}
@@ -463,15 +507,8 @@
           {{ delete.csrf_token }}
           {{ delete.password.label(class='form-label') }}
           <div class="form-field">
-            {% if delete.password.errors %}
-              {{ delete.password(class='input-error') }}
-            {% else %}
-              {{ delete.password(class='form-input') }}
-            {% endif %}
+            {{ delete.password(class='form-input') }}
           </div>
-          {% for error in delete.password.errors %}
-            <p class="error">{{ error }}</p>
-          {% endfor %}
       <hr class="hr">
       {{ delete.deleteSubmit(class='sign-up button delete-submit')}}
       <p class="delete-warning">Once deleted, there is no way to restore your information! All of your information will be removed from our system.</p>
@@ -488,6 +525,10 @@
   editButton = document.getElementById('edit-profile-link');
   deleteButton = document.getElementById('delete-profile-link');
   viewButton = document.getElementById('view-profile-link');
+
+  function closeFlashMessage(flash_message){
+    document.getElementById(flash_message).style.display = 'none'
+  }
 
   function switchForm(link){
     if(link === 'delete-profile-link' && deleteForm.style.display == 'none'){
@@ -527,7 +568,6 @@
   editButton.addEventListener('click', switchForm);
   deleteButton.addEventListener('click', switchForm);
   viewButton.addEventListener('click',switchForm)
-
 
   $(document).ready(function(){
     $("#clear_session").click(function(){

@@ -161,7 +161,7 @@ def delete_user(session):
     return False
 
 
-def get_all_fuel_quotes_client():
+def get_all_fuel_quotes_client(session):
     get_history = 'Select * FROM FuelQuote WHERE client_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
@@ -172,7 +172,7 @@ def get_all_fuel_quotes_client():
     return get_history
 
 
-def add_fuel_quote( client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
+def add_fuel_quote( session,client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
     insert_quote= 'INSERT INTO FuelQuote (client_id,gallons_requested, delivery_address,delivery_date,suggested_price_per_gallon,total_amount_due)VALUES (%s,%s,%s,%s,%s,%s)'
     with get_conn() as conn, conn.cursor() as cursor:
             vals =(get_clientID(session),gallons_requested,client_address,delivery_date,price_per_gallon,total_amount_due)
@@ -214,7 +214,7 @@ def fuel_quote_form():
     client= {}
     client['deliveryAddress'] = get_address(session)
     if request.method =="GET":
-         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
+         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
     if formQ.validate_on_submit():
         #print(get_address(session))
         gallons, address= formQ.gallons.data,get_address(session)
@@ -222,9 +222,9 @@ def fuel_quote_form():
         calculation_instance = Calculation()
 
         formQ.price.data  = calculation_instance.Price(gallons, address, has_history())
-        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
     else:
-        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
 
 
 @app.route('/finalize_value',methods=['POST'])
@@ -237,7 +237,7 @@ def confirm_quote():
         Gallons = data_incoming.get('gallons')
         Date = data_incoming.get('date')
         Address = get_address(session)
-        add_fuel_quote( Address, Gallons, Date, Suggested_Price, Total_Amount)
+        add_fuel_quote( session,Address, Gallons, Date, Suggested_Price, Total_Amount)
 
     return 'Success',200
 

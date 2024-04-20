@@ -8,3 +8,4 @@ python-dotenv
 Flask-CORS
 gunicorn
 Werkzeug
+pymysql

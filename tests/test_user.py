@@ -117,32 +117,6 @@ def test_get_user_ID( test_client, conn, hash):
 		vals = (username, hash(password))
 		cursor.execute(query, vals)
 	conn.commit()
-	
-	userID = 0
-	# Add session values
-	with test_client.session_transaction() as session:
-		FakinIT = 1
-		with conn.cursor() as cursor:
-			query = "Select ID FROM UserCredentials where username =%s"
-			vals = ('test_user23')
-			cursor.execute(query, vals)
-			FakinIT =cursor.fetchone()[0]
-		conn.commit()
-		session['username'] = 'test_user23'
-		# UserCredentials primary key auto increments, therefore the client ID is the last row
-		userID = cursor.lastrowid
-
-	# Get user ID. Since get_userID accesses the session, need to use the app.test_request_context() 
- 	# context manager to not get a working outside request context error
-
-		assert FakinIT == FakinIT
-
-	# Delete test user and session
-	with conn.cursor() as cursor:
-		query = "DELETE FROM UserCredentials WHERE username = %s"
-		vals = (username)
-		cursor.execute(query, vals)
-	conn.commit()
-
-	with test_client.session_transaction() as session:
-		session.pop('username', None)
+	ph = dict()
+	ph['username'] = username
+	assert (get_userID(ph))

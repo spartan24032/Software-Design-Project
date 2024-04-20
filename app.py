@@ -64,14 +64,15 @@ def get_clientID(session):
         return get_client_id[0] 
     return get_client_id
 def get_address(session):
-    get_client_address = 'Select address1 FROM ClientInformation WHERE user_credentials_id = %s'
+    get_client_address = 'Select address1,city,state,zipcode FROM ClientInformation WHERE user_credentials_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor.execute(get_client_address ,get_userID(session))
             get_client_address = cursor.fetchone()
             conn.commit()
 
     if(get_client_address  is not None):
-        return get_client_address [0] 
+        get_client_address = get_client_address[0]+ " "+ get_client_address[1] + " "+  get_client_address[2] + " "+  str(get_client_address[3])
+        return get_client_address 
     return get_client_address 
 def has_history():
     get_history = 'Select 1 FROM FuelQuote WHERE client_id = %s'
@@ -161,7 +162,7 @@ def delete_user(session):
     return False
 
 
-def get_all_fuel_quotes_client():
+def get_all_fuel_quotes_client(session):
     get_history = 'Select * FROM FuelQuote WHERE client_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
@@ -172,7 +173,7 @@ def get_all_fuel_quotes_client():
     return get_history
 
 
-def add_fuel_quote( client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
+def add_fuel_quote( session,client_address, gallons_requested, delivery_date, price_per_gallon, total_amount_due):
     insert_quote= 'INSERT INTO FuelQuote (client_id,gallons_requested, delivery_address,delivery_date,suggested_price_per_gallon,total_amount_due)VALUES (%s,%s,%s,%s,%s,%s)'
     with get_conn() as conn, conn.cursor() as cursor:
             vals =(get_clientID(session),gallons_requested,client_address,delivery_date,price_per_gallon,total_amount_due)
@@ -214,17 +215,19 @@ def fuel_quote_form():
     client= {}
     client['deliveryAddress'] = get_address(session)
     if request.method =="GET":
-         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
+         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
     if formQ.validate_on_submit():
         #print(get_address(session))
         gallons, address= formQ.gallons.data,get_address(session)
+        #print(address)
         # Assuming 'gallons', 'address', and 'has_history()' are defined somewhere
         calculation_instance = Calculation()
+        #print(has_history())
 
         formQ.price.data  = calculation_instance.Price(gallons, address, has_history())
-        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
     else:
-        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(),client=client)
+        return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
 
 
 @app.route('/finalize_value',methods=['POST'])
@@ -237,7 +240,7 @@ def confirm_quote():
         Gallons = data_incoming.get('gallons')
         Date = data_incoming.get('date')
         Address = get_address(session)
-        add_fuel_quote( Address, Gallons, Date, Suggested_Price, Total_Amount)
+        add_fuel_quote( session,Address, Gallons, Date, Suggested_Price, Total_Amount)
 
     return 'Success',200
 
@@ -324,5 +327,5 @@ def style_css():
     return send_file(os.path.dirname(__file__)+r'flask_app/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)),debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)),debug=True)
 

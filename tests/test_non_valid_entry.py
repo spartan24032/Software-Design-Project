@@ -139,7 +139,7 @@ def test_add_fuel_quote(test_client,conn):
     with conn.cursor() as cursor:
         cursor.execute('SELECT * FROM FuelQuote WHERE delivery_address = %s', (client_address,))
         result = cursor.fetchone()
-    print(result)
+   # print(result)
     # Verify that the quote was successfully added to the database
     assert result is not None  # Check if a row was returned from the database
     assert result[2] == gallons_requested  # Check if gallons_requested matches

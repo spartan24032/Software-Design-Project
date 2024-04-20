@@ -331,5 +331,5 @@ def style_css():
     return send_file(os.path.dirname(__file__)+r'flask_app/public/css/styles.css')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)))
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
 

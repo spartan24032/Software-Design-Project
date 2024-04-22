@@ -5,10 +5,6 @@ from dotenv import load_dotenv
 def create_app():
     # load environment variables from .env file
     load_dotenv()
-    print(os.environ.get('MYSQL_HOST'))
-    print(os.environ.get('MYSQL_USER'))
-    print(os.environ.get('MYSQL_PASSWORD'))
-    print(os.environ.get('MYSQL_DB'))
     project_dir = os.path.dirname(__file__)
     print(project_dir)
     app = Flask(__name__, template_folder=project_dir+r'\templates', static_folder=project_dir+r'\public')

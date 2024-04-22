@@ -50,9 +50,10 @@ def get_userID(session ):
             #First Find the ID
             vals =(session['username'])
             cursor.execute(get_user_id,vals)
-            get_user_id= cursor.fetchone()[0]
+            get_user_id= cursor.fetchone()
+    
             conn.commit()
-    return get_user_id
+    return get_user_id[0]
 def get_clientID(session):
     get_client_id  = 'Select client_id FROM ClientInformation WHERE user_credentials_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
@@ -74,7 +75,7 @@ def get_address(session):
         get_client_address = get_client_address[0]+ " "+ get_client_address[1] + " "+  get_client_address[2] + " "+  str(get_client_address[3])
         return get_client_address 
     return get_client_address 
-def has_history():
+def has_history(session):
     get_history = 'Select 1 FROM FuelQuote WHERE client_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor.execute(get_history,get_clientID(session))
@@ -224,7 +225,7 @@ def fuel_quote_form():
         calculation_instance = Calculation()
         #print(has_history())
 
-        formQ.price.data  = calculation_instance.Price(gallons, address, has_history())
+        formQ.price.data  = calculation_instance.Price(gallons, address, has_history(session))
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
     else:
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)

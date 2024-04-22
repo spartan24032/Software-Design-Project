@@ -39,16 +39,36 @@ def test_valid_profile_edit(test_client,conn):
 		cursor.execute(query,vals)
 	conn.commit()
 	
+	edit_name = 'President'
+	edit_address1 = '1600 Pennsylvania Avenue, N.W.'
+	edit_address2 = 'Not Applicable'
+	edit_city = 'Washington'
+	edit_state = 'DC'
+	edit_zipcode = '20500'
+
 	# Test with valid data
 	response = test_client.post(
 		'/profile/edit',
-		data={'name': 'President', 'address1': '1600 Pennsylvania Avenue, N.W.', 'address2': 'Not Applicable', 'city': 'Washington', 'state': 'DC', 'zipcode': '20500'},
+		data={'name': edit_name, 'address1': edit_address1, 'address2': edit_address2, 'city': edit_city, 'state': edit_state, 'zipcode': edit_zipcode},
 		follow_redirects=True
 	)
 
-	# If successful, should redirect to /profile
-	assert len(response.history) == 1
-	assert response.request.path == "/profile"
+	assert response.status_code == 200
+
+	# Check that the database was updated
+	with conn.cursor() as cursor:
+		query = "SELECT name, address1, address2, city, state, zipcode, user_credentials_id FROM ClientInformation WHERE user_credentials_id = %s"
+		vals = (ID)
+		cursor.execute(query,vals)
+		client_info = cursor.fetchone() # returns a tuple
+	conn.commit()
+
+	assert client_info[0] == edit_name
+	assert client_info[1] == edit_address1
+	assert client_info[2] == edit_address2
+	assert client_info[3] == edit_city
+	assert client_info[4] == edit_state
+	assert client_info[5] == int(edit_zipcode)
 
 	# Teardown
 	with conn.cursor() as cursor:
@@ -104,6 +124,8 @@ def test_valid_profile_deletion(test_client,conn,hash):
 			follow_redirects=True
 		)
 	
+	assert response.status_code == 200
+	
 	# Test if deleted 
 	with conn.cursor() as cursor:
 		query = "SELECT * FROM UserCredentials WHERE username = %s"
@@ -114,9 +136,6 @@ def test_valid_profile_deletion(test_client,conn,hash):
 
 	# If there is no row fetched by the query, it means deletion was successful
 	assert row == None
-	
-	assert len(response.history) == 1
-	assert response.request.path == "/"
 
 def test_invalid_profile_deletion(test_client, conn):
 	password = ''

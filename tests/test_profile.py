@@ -19,12 +19,26 @@ def test_valid_profile_edit(test_client,conn):
 		cursor.execute(query, vals)
 	conn.commit()
 
-	# Add test user 
-	with conn.cursor() as cursor:
-		query = "INSERT INTO UserCredentials (username, encrypted_password) VALUES (%s,%s)"
-		vals = (username, hash(password))
-		cursor.execute(query, vals)
-	conn.commit()
+	# # Add test user 
+	# with conn.cursor() as cursor:
+	# 	query = "INSERT INTO UserCredentials (username, encrypted_password) VALUES (%s,%s)"
+	# 	vals = (username, hash(password))
+	# 	cursor.execute(query, vals)
+	# conn.commit()
+ 
+	response_signup = test_client.post(
+		'/signup',
+		data={'username': username, 'password': password, 'confirm_password': password},
+		follow_redirects=True
+	)
+	assert response_signup.status_code == 200
+
+	response_login = test_client.post(
+		'/login',
+		data={'username': username, 'password': password},
+		follow_redirects=True
+	)
+	assert response_login.status_code == 200
 
 	# Set session username
 	ID = 0

@@ -50,8 +50,10 @@ def get_userID(session ):
             #First Find the ID
             vals =(session['username'])
             cursor.execute(get_user_id,vals)
-            get_user_id= cursor.fetchone()[0]
+            get_user_id= cursor.fetchone()
             conn.commit()
+    if(get_user_id is not None):
+        return get_user_id[0]
     return get_user_id
 def get_clientID(session):
     get_client_id  = 'Select client_id FROM ClientInformation WHERE user_credentials_id = %s'
@@ -183,23 +185,22 @@ def add_fuel_quote( session,client_address, gallons_requested, delivery_date, pr
 def get_profile_data():
     place_holder_start = {'name': '','address1': '','address2': '','city': '','state': '','zipcode': ''}
 
-    get_client_info = 'Select name, address1, address2,city,state, zipcode FROM ClientInformation WHERE user_credentials_id = %s'
-    with get_conn() as conn, conn.cursor() as cursor:
-            #Use this when you need to send data back as a Dictionary instead of a tuple
-            cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
+    user_ID = get_userID(session)
+    if (user_ID is not None):
+        get_client_info = 'Select name, address1, address2,city,state, zipcode FROM ClientInformation WHERE user_credentials_id = %s'
+        with get_conn() as conn, conn.cursor() as cursor:
+                # Use this when you need to send data back as a Dictionary instead of a tuple
+                cursor = conn.cursor(cursor=pymysql.cursors.DictCursor)
 
-            cursor.execute(get_client_info,get_userID(session))
-            get_client_info = cursor.fetchone()
-            conn.commit()
-
+                cursor.execute(get_client_info,user_ID)
+                get_client_info = cursor.fetchone()
+                conn.commit()
     if(get_client_info ==None):
         return place_holder_start
-
     return get_client_info
 def non_valid_point(session):
     if ("username" not in session):
         return True
-
 #Routing Functions 
 @app.route('/') 
 def homepage():

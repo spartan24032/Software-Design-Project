@@ -224,6 +224,9 @@ def fuel_quote_form():
         # Assuming 'gallons', 'address', and 'has_history()' are defined somewhere
         calculation_instance = Calculation()
         #print(has_history())
+        session['gallons_requested'] = gallons
+
+    
 
         formQ.price.data  = calculation_instance.Price(gallons, address, has_history(session))
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
@@ -238,8 +241,12 @@ def confirm_quote():
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
         Suggested_Price = data_incoming.get('suggestedPrice').strip('$')
-        Gallons = data_incoming.get('gallons')
+        Gallons = 0
         Date = data_incoming.get('date')
+        try:
+            Gallons = session['gallons_requested'] #data_incoming.get('gallons')
+        except KeyError: 
+            Gallons = data_incoming.get('gallons')
         Address = get_address(session)
         add_fuel_quote( session,Address, Gallons, Date, Suggested_Price, Total_Amount)
 

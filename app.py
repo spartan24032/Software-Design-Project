@@ -76,7 +76,7 @@ def get_address(session):
         get_client_address = get_client_address[0]+ " "+ get_client_address[1] + " "+  get_client_address[2] + " "+  str(get_client_address[3])
         return get_client_address 
     return get_client_address 
-def has_history():
+def has_history(session):
     get_history = 'Select 1 FROM FuelQuote WHERE client_id = %s'
     with get_conn() as conn, conn.cursor() as cursor:
             cursor.execute(get_history,get_clientID(session))
@@ -224,8 +224,11 @@ def fuel_quote_form():
         # Assuming 'gallons', 'address', and 'has_history()' are defined somewhere
         calculation_instance = Calculation()
         #print(has_history())
+        session['gallons_requested'] = gallons
 
-        formQ.price.data  = calculation_instance.Price(gallons, address, has_history())
+    
+
+        formQ.price.data  = calculation_instance.Price(gallons, address, has_history(session))
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
     else:
         return render_template("quote_form.html",form=formQ,fuel_quotes=get_all_fuel_quotes_client(session),client=client)
@@ -238,8 +241,12 @@ def confirm_quote():
         data_incoming = request.form
         Total_Amount = data_incoming.get('totalAmount').strip('$')
         Suggested_Price = data_incoming.get('suggestedPrice').strip('$')
-        Gallons = data_incoming.get('gallons')
+        Gallons = 0
         Date = data_incoming.get('date')
+        try:
+            Gallons = session['gallons_requested'] #data_incoming.get('gallons')
+        except KeyError: 
+            Gallons = data_incoming.get('gallons')
         Address = get_address(session)
         add_fuel_quote( session,Address, Gallons, Date, Suggested_Price, Total_Amount)
 
